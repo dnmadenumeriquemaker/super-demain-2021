@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title></title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/css.css">
+</head>
+
+
+<body>
+
+  <div id="game">
+    <section class="state-screen" data-state-screen="wait">
+      Le smartphone, objet total
+    </section>
+
+    <section class="state-screen" data-state-screen="intro">
+      Règles du jeu
+      <div data-show-if-can-interact-is="true">
+        Appuyez sur le bouton pour continuer
+      </div>
+    </section>
+
+    <section class="state-screen" data-state-screen="play">
+      <div class="play-background"></div>
+      <div class="play-foreground"></div>
+      <div class="play-player"></div>
+
+      <article class="play-step" data-play-step-id="0" data-right-choice="1">
+        <div class="question">
+          Et le jour où tu es coincé seul sur une île déserte, tu vas faire quoi ?
+        </div>
+        <div class="choice choice-left" data-right-choice>
+          J'envoie un message à mes potes pour les prévenir
+        </div>
+        <div class="choice choice-right" data-wrong-choice>
+          J'écris S.O.S dans le sable avec un bâton
+        </div>
+      </article>
+
+      <article class="play-step" data-play-step-id="1" data-right-choice="2">
+        <div class="question">
+          Vous faites quoi avec votre téléphone au magasin ?
+        </div>
+        <div class="choice choice-left" data-wrong-choice>
+          Choix 1
+        </div>
+        <div class="choice choice-right" data-right-choice>
+          Choix 2
+        </div>
+      </article>
+
+    </section>
+
+    <section class="state-screen" data-state-screen="won">
+      Gagné !
+    </section>
+
+    <section class="state-screen" data-state-screen="lost">
+      Perdu !
+    </section>
+
+    <section class="state-screen" data-state-screen="outro">
+      Conclusion et fin de l'expérience
+    </section>
+  </div>
+
+  <div id="phone">
+    <div id="score"></div>
+    <div id="score-bar"></div>
+  </div>
+
+  <script type="text/javascript" src="js/jquery.js"></script>
+  <script type="text/javascript" src="js/jquery-ui.js"></script>
+  <script type="text/javascript" src="js/game.js"></script>
+  <script type="text/javascript" src="js/js.js"></script>
+</body>
+</html>

@@ -1,0 +1,222 @@
+body {
+  background:black;
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+}
+
+#game {
+  width:1000px;
+  height:800px;
+  background:white;
+  position:absolute;
+  top:50px;
+  left:50px;
+  overflow:hidden;
+}
+
+#phone {
+  width:300px;
+  height:600px;
+  background:#333;
+  position:absolute;
+  top:150px;
+  left:1200px;
+  overflow:hidden;
+}
+
+#score-bar {
+  position:absolute;
+  bottom:0;
+  left:0;
+  right:0;
+  height:100%;
+  background:#4FFFBF;
+  transition:height 1000ms linear;
+}
+
+
+
+
+
+.play-background {
+  width:40000%;
+  height:100%;
+  position:absolute;
+  top:0;
+  left:0;
+  background:url(../assets/background.png) no-repeat left center / auto 100% transparent;
+  transition:left 3000ms cubic-bezier(0.225, 0.000, 0.755, 1.000);
+}
+
+body[data-state="play"][data-play-step-id="0"] .play-background { left:0%; }
+body[data-state="play"][data-play-step-id="1"] .play-background { left:-100%; }
+body[data-state="play"][data-play-step-id="2"] .play-background { left:-200%; }
+body[data-state="play"][data-play-step-id="3"] .play-background { left:-300%; }
+/* TODO */
+
+
+
+.play-foreground {
+  width:20000%;
+  height:100%;
+  position:absolute;
+  top:0;
+  left:0;
+  background:url(../assets/foreground.png) no-repeat left center / auto 100% transparent;
+  transition:left 3000ms cubic-bezier(0.225, 0.000, 0.755, 1.000);
+}
+
+body[data-state="play"][data-play-step-id="0"] .play-foreground { left:0%; }
+body[data-state="play"][data-play-step-id="1"] .play-foreground { left:-200%; }
+body[data-state="play"][data-play-step-id="2"] .play-foreground { left:-400%; }
+body[data-state="play"][data-play-step-id="3"] .play-foreground { left:-600%; }
+/* TODO */
+
+
+.play-player {
+  width: 190px;
+  height: 240px;
+  background: url('../assets/player.png') left center;
+  position:absolute;
+  top:370px;
+  left:405px;
+  animation: player 0.8s steps(10) infinite forwards;
+  animation-play-state: paused;
+}
+
+@keyframes player {
+   100% { background-position: -1900px; }
+}
+
+body[data-state="play"][data-play-step="transition"] .play-player {
+  animation-play-state: running;
+}
+
+body[data-state="play"][data-play-step="right-choice"] .play-player {
+  /* Custom sprite for player */
+}
+
+body[data-state="play"][data-play-step="wrong-choice"] .play-player {
+  /* Custom sprite for player */
+}
+
+
+
+.play-step {
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  z-index:1000;
+  opacity:0;
+}
+
+
+body[data-state="play"][data-play-step-id="0"] .play-step[data-play-step-id="0"],
+body[data-state="play"][data-play-step-id="1"] .play-step[data-play-step-id="1"],
+body[data-state="play"][data-play-step-id="2"] .play-step[data-play-step-id="2"],
+body[data-state="play"][data-play-step-id="3"] .play-step[data-play-step-id="3"],
+body[data-state="play"][data-play-step-id="4"] .play-step[data-play-step-id="4"],
+body[data-state="play"][data-play-step-id="5"] .play-step[data-play-step-id="5"],
+body[data-state="play"][data-play-step-id="6"] .play-step[data-play-step-id="6"],
+body[data-state="play"][data-play-step-id="7"] .play-step[data-play-step-id="7"],
+body[data-state="play"][data-play-step-id="8"] .play-step[data-play-step-id="8"],
+body[data-state="play"][data-play-step-id="9"] .play-step[data-play-step-id="9"],
+body[data-state="play"][data-play-step-id="10"] .play-step[data-play-step-id="10"],
+body[data-state="play"][data-play-step-id="11"] .play-step[data-play-step-id="11"],
+body[data-state="play"][data-play-step-id="12"] .play-step[data-play-step-id="12"],
+body[data-state="play"][data-play-step-id="13"] .play-step[data-play-step-id="13"],
+body[data-state="play"][data-play-step-id="14"] .play-step[data-play-step-id="14"],
+body[data-state="play"][data-play-step-id="15"] .play-step[data-play-step-id="15"],
+body[data-state="play"][data-play-step-id="16"] .play-step[data-play-step-id="16"],
+body[data-state="play"][data-play-step-id="17"] .play-step[data-play-step-id="17"],
+body[data-state="play"][data-play-step-id="18"] .play-step[data-play-step-id="18"],
+body[data-state="play"][data-play-step-id="19"] .play-step[data-play-step-id="19"],
+body[data-state="play"][data-play-step-id="20"] .play-step[data-play-step-id="20"] {
+  opacity:1;
+}
+
+
+
+
+.play-step .question {
+  font-size:36px;
+  text-align:center;
+  font-weight:bold;
+  position:absolute;
+  top:64px;
+  left:64px;
+  right:64px;
+  opacity:0;
+}
+
+body[data-state="play"][data-play-step="show-question"] .question,
+body[data-state="play"][data-play-step="show-choices"] .question,
+body[data-state="play"][data-play-step="listen-to-user"] .question,
+body[data-state="play"][data-play-step="right-choice"] .question,
+body[data-state="play"][data-play-step="wrong-choice"] .question {
+  opacity:1;
+}
+
+.play-step .choice {
+  position:absolute;
+  width:35%;
+  height:300px;
+  top:250px;
+  font-size:26px;
+  text-align:center;
+  opacity:0;
+}
+
+.play-step .choice-left { left:32px; }
+.play-step .choice-right { right:32px; }
+
+body[data-state="play"][data-play-step="show-choices"] .choice,
+body[data-state="play"][data-play-step="listen-to-user"] .choice,
+body[data-state="play"][data-play-step="right-choice"] .choice,
+body[data-state="play"][data-play-step="wrong-choice"] .choice {
+  opacity:1;
+}
+
+body[data-state="play"][data-play-step="right-choice"] .choice[data-right-choice] {
+  color:green;
+}
+
+body[data-state="play"][data-play-step="wrong-choice"] .choice[data-wrong-choice] {
+  color:red;
+}
+
+
+
+.state-screen {
+  position:absolute;
+  top:0;
+  left:0;
+  bottom:0;
+  right:0;
+  background:white;
+  display:none;
+}
+
+body[data-state="wait"] .state-screen[data-state-screen="wait"],
+body[data-state="intro"] .state-screen[data-state-screen="intro"],
+body[data-state="play"] .state-screen[data-state-screen="play"],
+body[data-state="won"] .state-screen[data-state-screen="won"],
+body[data-state="lost"] .state-screen[data-state-screen="lost"],
+body[data-state="outro"] .state-screen[data-state-screen="outro"] {
+  display:block;
+}
+
+[data-show-if-can-interact-is]  {
+  opacity:0;
+}
+
+body[data-can-interact="true"] [data-show-if-can-interact-is="true"],
+body[data-can-interact="false"] [data-show-if-can-interact-is="false"] {
+  opacity:1;
+}
