@@ -32,7 +32,6 @@ class Game {
     this.timerInteraction = null;
     this.timerPlayStep = null;
     this.timerScore = null;
-    this.timer
 
     this.nbQuestions = NB_QUESTIONS;
     this.scoreMax = SCORE_MAX;
