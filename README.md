@@ -2,15 +2,17 @@
 
 
 ### [Project B](project-b/)
-[ ] Winning game (check score when question == 10)
+
+- [ ] Winning game (check score when question == 10)
 
 
 -----
 
 
 ### [Project D](project-d/)
-[ ] Use specific codes
-[ ] Set custom keyboard listening depending on state
+
+- [ ] Use specific codes
+- [ ] Set custom keyboard listening depending on state
 
 
 -----
