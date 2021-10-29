@@ -85,7 +85,7 @@ class Game {
   }
 
   canInteract() {
-    return this.interactionEnabled ;
+    return this.interactionEnabled;
   }
 
   setNextState() {
