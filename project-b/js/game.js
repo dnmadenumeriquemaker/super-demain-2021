@@ -5,26 +5,28 @@ const STATE_WAIT = 'wait',
       STATE_LOST = 'lost',
       STATE_OUTRO = 'outro';
 
-const PLAY_STEP_TRANSITION = 'transition',
-      PLAY_STEP_SHOW_QUESTION = 'show-question',
-      PLAY_STEP_SHOW_CHOICES = 'show-choices',
-      PLAY_STEP_LISTEN_TO_USER = 'listen-to-user',
-      PLAY_STEP_RIGHT_CHOICE = 'right-choice',
-      PLAY_STEP_WRONG_CHOICE = 'wrong-choice';
+const PLAY_STEP_STATE_TRANSITION = 'transition',
+      PLAY_STEP_STATE_SHOW_QUESTION = 'show-question',
+      PLAY_STEP_STATE_SHOW_CHOICES = 'show-choices',
+      PLAY_STEP_STATE_LISTEN_TO_USER = 'listen-to-user',
+      PLAY_STEP_STATE_RIGHT_CHOICE = 'right-choice',
+      PLAY_STEP_STATE_WRONG_CHOICE = 'wrong-choice';
 
-const DURATION_TRANSITION = 3000,
+const DURATION_TRANSITION_TO_NEXT_PLAY_STEP = 3000,
       DURATION_SHOW_QUESTION = 3000,
-      DURATION_SHOW_ANSWER = 5000;
+      DURATION_SHOW_ANSWER = 5000,
+      DURATION_BEFORE_LOST = 1500,
+      DURATION_OUTRO_TO_NEXT_GAME = 10000;
 
 const SCORE_MAX = 100,
       BONUS = 10,
       MALUS = -10,
-      NB_QUESTIONS = 20;
+      NB_QUESTIONS = 10;
 
 class Game {
   constructor() {
-    this.playStep;
-    this.canInteract;
+    this.playStepId;
+    this.interactionEnabled;
     this.score;
 
     this.timerInteraction = null;
@@ -43,9 +45,7 @@ class Game {
   init() {
     this.setState(this.state);
     this.enableInteraction();
-    this.setPlayStep(0);
-
-    this.score = SCORE_MAX;
+    this.initScore();
   }
 
   setState(state) {
@@ -63,7 +63,7 @@ class Game {
 
       case STATE_PLAY :
         this.disableInteraction();
-        this.setPlayStep(0);
+        this.setPlayStepId(0);
       break;
 
       case STATE_WON : // TODO : not tested yet
@@ -83,8 +83,16 @@ class Game {
     return state == this.state;
   }
 
+  isPlayStepId(stepId) {
+    return stepId == this.playStepId;
+  }
+
+  canInteract() {
+    return this.interactionEnabled ;
+  }
+
   setNextState() {
-    if (!this.canInteract) return;
+    if (!this.canInteract()) return;
 
     switch (this.state) {
       case STATE_WAIT :
@@ -102,49 +110,60 @@ class Game {
   }
 
 
-  setPlayStep(step) {
-    this.playStep = step;
-    this.$body.setAttribute('data-play-step-id', this.playStep);
-    this.setPlayStepState(PLAY_STEP_TRANSITION);
+  setPlayStepId(stepId) {
+    this.playStepId = stepId;
+    this.$body.setAttribute('data-play-step-id', this.playStepId);
+    this.setPlayStepState(PLAY_STEP_STATE_TRANSITION);
   }
 
   setNextPlayStep() {
-    this.playStep++;
-    this.setPlayStep(this.playStep);
+    this.playStepId++;
+    this.setPlayStepId(this.playStepId);
   }
 
   setPlayStepState(state) {
     const _this = this;
 
+    // when the game starts,
+    // playStep #0 is only a transition to playStep #1
+
+    if (this.playStepId == 0) {
+      this.setTimerPlayStep(function(){
+        _this.setNextPlayStep();
+      }, DURATION_TRANSITION_TO_NEXT_PLAY_STEP);
+      return;
+    }
+
     switch (state) {
-      case PLAY_STEP_TRANSITION :
+      case PLAY_STEP_STATE_TRANSITION :
         this.stopTimerScore();
         this.disableInteraction();
         this.setTimerPlayStep(function(){
-          _this.setPlayStepState(PLAY_STEP_SHOW_QUESTION);
-        }, DURATION_TRANSITION);
+          _this.setPlayStepState(PLAY_STEP_STATE_SHOW_QUESTION);
+        }, DURATION_TRANSITION_TO_NEXT_PLAY_STEP);
       break;
 
-      case PLAY_STEP_SHOW_QUESTION :
+      case PLAY_STEP_STATE_SHOW_QUESTION :
         this.disableInteraction();
         this.setTimerPlayStep(function(){
-          _this.setPlayStepState(PLAY_STEP_SHOW_CHOICES);
+          _this.setPlayStepState(PLAY_STEP_STATE_SHOW_CHOICES);
         }, DURATION_SHOW_QUESTION);
       break;
 
-      case PLAY_STEP_SHOW_CHOICES :
-        this.setPlayStepState(PLAY_STEP_LISTEN_TO_USER);
+      case PLAY_STEP_STATE_SHOW_CHOICES :
+        this.setPlayStepState(PLAY_STEP_STATE_LISTEN_TO_USER);
       break;
 
-      case PLAY_STEP_LISTEN_TO_USER :
+      case PLAY_STEP_STATE_LISTEN_TO_USER :
         this.enableInteraction();
         this.startTimerScore();
       break;
 
-      case PLAY_STEP_RIGHT_CHOICE :
+      case PLAY_STEP_STATE_RIGHT_CHOICE :
         this.stopTimerScore();
         this.disableInteraction();
-        this.setBonus();
+        this.setDataAnswer('right');
+        this.addBonus();
 
         this.setTimerPlayStep(function(){
           // TODO : ask for button action instead of timer?
@@ -153,10 +172,11 @@ class Game {
         }, DURATION_SHOW_ANSWER);
       break;
 
-      case PLAY_STEP_WRONG_CHOICE :
+      case PLAY_STEP_STATE_WRONG_CHOICE :
         this.stopTimerScore();
         this.disableInteraction();
-        this.setMalus();
+        this.setDataAnswer('wrong');
+        this.addMalus();
 
         this.setTimerPlayStep(function(){
           // TODO : ask for button action instead of timer?
@@ -166,23 +186,10 @@ class Game {
       break;
     }
 
-    this.$body.setAttribute('data-play-step', state);
+    this.$body.setAttribute('data-play-step-state', state);
   }
 
 
-  setMalus() {
-    this.score += MALUS;
-
-    this.checkScore();
-    this.displayScore();
-  }
-
-  setBonus() {
-    this.score += BONUS;
-
-    this.checkScore();
-    this.displayScore();
-  }
 
   startTimerScore() {
     const _this = this;
@@ -204,30 +211,54 @@ class Game {
     this.displayScore();
   }
 
+  initScore() {
+    this.score = SCORE_MAX;
+    this.displayScore();
+  }
+
+  addMalus() {
+    this.score += MALUS;
+
+    this.checkScore();
+    this.displayScore();
+  }
+
+  addBonus() {
+    this.score += BONUS;
+
+    this.checkScore();
+    this.displayScore();
+  }
+
   displayScore() {
     this.$score.innerHTML = this.score;
-    this.$scoreBar.style.height = this.score + '%';
+    this.$scoreBar.style.height = (this.score / SCORE_MAX * 100) + '%';
+    this.$body.setAttribute('data-score', this.score);
   }
 
   checkScore() {
+    const _this = this;
+
     if (this.score <= 0) {
-      this.setState(STATE_LOST);
+      this.score = 0;
+      setTimeout(function(){
+        _this.setState(STATE_LOST);
+      },DURATION_BEFORE_LOST);
     }
     if (this.score >= SCORE_MAX) {
       this.score = SCORE_MAX;
     }
   }
 
-
   selectChoice(userChoice) {
-    if (!this.canInteract) return;
+    if (!this.canInteract()) return;
 
-    const rightChoice = document.querySelector('.play-step[data-play-step-id="'+this.playStep+'"]').getAttribute('data-right-choice');
+    const rightChoice = document.querySelector('.play-step[data-play-step-id="'+this.playStepId+'"]').getAttribute('data-right-choice');
 
     if (userChoice == rightChoice) {
-      this.setPlayStepState(PLAY_STEP_RIGHT_CHOICE);
+      this.setPlayStepState(PLAY_STEP_STATE_RIGHT_CHOICE);
     } else {
-      this.setPlayStepState(PLAY_STEP_WRONG_CHOICE);
+      this.setPlayStepState(PLAY_STEP_STATE_WRONG_CHOICE);
     }
   }
 
@@ -261,12 +292,16 @@ class Game {
   }
 
   disableInteraction() {
-    this.canInteract = false;
+    this.interactionEnabled = false;
     this.$body.setAttribute('data-can-interact', false);
   }
 
   enableInteraction() {
-    this.canInteract = true;
+    this.interactionEnabled = true;
     this.$body.setAttribute('data-can-interact', true);
+  }
+
+  setDataAnswer(answer) {
+    this.$body.setAttribute('data-question-'+this.playStepId, answer);
   }
 }

@@ -28,6 +28,34 @@ body {
   overflow:hidden;
 }
 
+#phone-dead {
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  bottom:0;
+  background:red;
+  color:white;
+  font-size:100px;
+  z-index:200;
+  opacity:0;
+}
+
+body[data-state="lost"] #phone-dead {
+  opacity:1;
+}
+
+#score {
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%, -50%);
+  text-align:center;
+  color:white;
+  font-size:82px;
+  z-index:100;
+}
+
 #score-bar {
   position:absolute;
   bottom:0;
@@ -56,7 +84,13 @@ body[data-state="play"][data-play-step-id="0"] .play-background { left:0%; }
 body[data-state="play"][data-play-step-id="1"] .play-background { left:-100%; }
 body[data-state="play"][data-play-step-id="2"] .play-background { left:-200%; }
 body[data-state="play"][data-play-step-id="3"] .play-background { left:-300%; }
-/* TODO */
+body[data-state="play"][data-play-step-id="4"] .play-background { left:-400%; }
+body[data-state="play"][data-play-step-id="5"] .play-background { left:-500%; }
+body[data-state="play"][data-play-step-id="6"] .play-background { left:-600%; }
+body[data-state="play"][data-play-step-id="7"] .play-background { left:-700%; }
+body[data-state="play"][data-play-step-id="8"] .play-background { left:-800%; }
+body[data-state="play"][data-play-step-id="9"] .play-background { left:-900%; }
+body[data-state="play"][data-play-step-id="10"] .play-background { left:-1000%; }
 
 
 
@@ -74,7 +108,65 @@ body[data-state="play"][data-play-step-id="0"] .play-foreground { left:0%; }
 body[data-state="play"][data-play-step-id="1"] .play-foreground { left:-200%; }
 body[data-state="play"][data-play-step-id="2"] .play-foreground { left:-400%; }
 body[data-state="play"][data-play-step-id="3"] .play-foreground { left:-600%; }
-/* TODO */
+body[data-state="play"][data-play-step-id="4"] .play-foreground { left:-800%; }
+body[data-state="play"][data-play-step-id="5"] .play-foreground { left:-1000%; }
+body[data-state="play"][data-play-step-id="6"] .play-foreground { left:-1200%; }
+body[data-state="play"][data-play-step-id="7"] .play-foreground { left:-1400%; }
+body[data-state="play"][data-play-step-id="8"] .play-foreground { left:-1600%; }
+body[data-state="play"][data-play-step-id="9"] .play-foreground { left:-1800%; }
+body[data-state="play"][data-play-step-id="10"] .play-foreground { left:-2000%; }
+
+.play-foreground .npc {
+  position:absolute;
+  bottom:200px;
+}
+
+#npc1 {
+  left:2600px;
+  width:200px;
+  height:100px;
+  background:url('../assets/npc1.png') center top / 100% auto;
+  animation: npc1 1s steps(12) infinite forwards;
+  animation-play-state: paused;
+}
+
+@keyframes npc1 {
+   100% { background-position: 0 -1196px; }
+}
+
+
+
+body[data-state="play"][data-play-step-id="1"][data-play-step-state="transition"] #npc1 {
+  /* NPC is appearing */
+  animation-play-state: running;
+}
+
+body[data-state="play"][data-play-step-id="1"][data-play-step-state="show_answer"] #npc1 {
+  /* Question is displayed */
+  animation-play-state: paused;
+}
+
+body[data-state="play"][data-play-step-id="1"][data-play-step-state="show_choices"] #npc1 {
+  /* Choices are displayed */
+}
+
+body[data-state="play"][data-play-step-id="1"][data-play-step-state="listen_to_user"] #npc1 {
+  /* Waiting for user to vote (timer is on) */
+}
+
+body[data-state="play"][data-question-1] #npc1 {
+  /* User has voted */
+}
+
+body[data-state="play"][data-question-1="right"] #npc1 {
+  /* Question has been answered, but right choice */
+  background:green;
+}
+
+body[data-state="play"][data-question-1="wrong"] #npc1 {
+  /* Question has been answered, but wrong choice */
+  background:red;
+}
 
 
 .play-player {
@@ -83,7 +175,7 @@ body[data-state="play"][data-play-step-id="3"] .play-foreground { left:-600%; }
   background: url('../assets/player.png') left center;
   position:absolute;
   top:370px;
-  left:405px;
+  left:305px;
   animation: player 0.8s steps(10) infinite forwards;
   animation-play-state: paused;
 }
@@ -92,15 +184,15 @@ body[data-state="play"][data-play-step-id="3"] .play-foreground { left:-600%; }
    100% { background-position: -1900px; }
 }
 
-body[data-state="play"][data-play-step="transition"] .play-player {
+body[data-state="play"][data-play-step-state="transition"] .play-player {
   animation-play-state: running;
 }
 
-body[data-state="play"][data-play-step="right-choice"] .play-player {
+body[data-state="play"][data-play-step-state="right-choice"] .play-player {
   /* Custom sprite for player */
 }
 
-body[data-state="play"][data-play-step="wrong-choice"] .play-player {
+body[data-state="play"][data-play-step-state="wrong-choice"] .play-player {
   /* Custom sprite for player */
 }
 
@@ -155,11 +247,11 @@ body[data-state="play"][data-play-step-id="20"] .play-step[data-play-step-id="20
   opacity:0;
 }
 
-body[data-state="play"][data-play-step="show-question"] .question,
-body[data-state="play"][data-play-step="show-choices"] .question,
-body[data-state="play"][data-play-step="listen-to-user"] .question,
-body[data-state="play"][data-play-step="right-choice"] .question,
-body[data-state="play"][data-play-step="wrong-choice"] .question {
+body[data-state="play"][data-play-step-state="show-question"] .question,
+body[data-state="play"][data-play-step-state="show-choices"] .question,
+body[data-state="play"][data-play-step-state="listen-to-user"] .question,
+body[data-state="play"][data-play-step-state="right-choice"] .question,
+body[data-state="play"][data-play-step-state="wrong-choice"] .question {
   opacity:1;
 }
 
@@ -176,18 +268,18 @@ body[data-state="play"][data-play-step="wrong-choice"] .question {
 .play-step .choice-left { left:32px; }
 .play-step .choice-right { right:32px; }
 
-body[data-state="play"][data-play-step="show-choices"] .choice,
-body[data-state="play"][data-play-step="listen-to-user"] .choice,
-body[data-state="play"][data-play-step="right-choice"] .choice,
-body[data-state="play"][data-play-step="wrong-choice"] .choice {
+body[data-state="play"][data-play-step-state="show-choices"] .choice,
+body[data-state="play"][data-play-step-state="listen-to-user"] .choice,
+body[data-state="play"][data-play-step-state="right-choice"] .choice,
+body[data-state="play"][data-play-step-state="wrong-choice"] .choice {
   opacity:1;
 }
 
-body[data-state="play"][data-play-step="right-choice"] .choice[data-right-choice] {
+body[data-state="play"][data-play-step-state="right-choice"] .choice[data-right-choice] {
   color:green;
 }
 
-body[data-state="play"][data-play-step="wrong-choice"] .choice[data-wrong-choice] {
+body[data-state="play"][data-play-step-state="wrong-choice"] .choice[data-wrong-choice] {
   color:red;
 }
 

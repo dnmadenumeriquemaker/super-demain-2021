@@ -13,10 +13,19 @@
 <body>
 
   <div id="game">
+    <!--
+      Wait screen:
+      you can put images and texts
+    -->
     <section class="state-screen" data-state-screen="wait">
       Le smartphone, objet total
     </section>
 
+
+    <!--
+      Intro screen:
+      you can put game rules here
+    -->
     <section class="state-screen" data-state-screen="intro">
       Règles du jeu
       <div data-show-if-can-interact-is="true">
@@ -24,12 +33,20 @@
       </div>
     </section>
 
+
+    <!--
+      Play screen:
+      player, game images and questions/choices are here
+    -->
     <section class="state-screen" data-state-screen="play">
       <div class="play-background"></div>
-      <div class="play-foreground"></div>
+      <div class="play-foreground">
+        <div class="npc" id="npc1"></div>
+      </div>
       <div class="play-player"></div>
 
-      <article class="play-step" data-play-step-id="0" data-right-choice="1">
+
+      <article class="play-step" data-play-step-id="1" data-right-choice="1">
         <div class="question">
           Et le jour où tu es coincé seul sur une île déserte, tu vas faire quoi ?
         </div>
@@ -41,7 +58,8 @@
         </div>
       </article>
 
-      <article class="play-step" data-play-step-id="1" data-right-choice="2">
+
+      <article class="play-step" data-play-step-id="2" data-right-choice="2">
         <div class="question">
           Vous faites quoi avec votre téléphone au magasin ?
         </div>
@@ -55,23 +73,43 @@
 
     </section>
 
+
+    <!--
+      Won screen
+    -->
     <section class="state-screen" data-state-screen="won">
       Gagné !
     </section>
 
+
+    <!--
+      Lost screen
+    -->
     <section class="state-screen" data-state-screen="lost">
       Perdu !
     </section>
 
+
+    <!--
+      Outro screen:
+      end of the game
+    -->
     <section class="state-screen" data-state-screen="outro">
       Conclusion et fin de l'expérience
     </section>
   </div>
 
+
   <div id="phone">
     <div id="score"></div>
     <div id="score-bar"></div>
+
+    <div id="phone-dead" data-show-if-lost>X(</div>
   </div>
+
+
+  <!-- TODO : preload all images -->
+
 
   <script type="text/javascript" src="js/jquery.js"></script>
   <script type="text/javascript" src="js/jquery-ui.js"></script>

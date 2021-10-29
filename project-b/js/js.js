@@ -1,11 +1,12 @@
 let game = new Game();
 
+document.addEventListener("DOMContentLoaded", function() {
 
-$(function(){
   game.init();
+  //game.setState(STATE_WAIT);
   game.setState(STATE_PLAY);
 
-  $(document).on('keydown', function(e){
+  document.addEventListener('keydown', function(e) {
     if (e.which == 39) {
       if (game.isState(STATE_PLAY)) {
         game.setNextPlayStep();
@@ -22,4 +23,5 @@ $(function(){
       game.selectChoice(2);
     }
   });
+
 });
