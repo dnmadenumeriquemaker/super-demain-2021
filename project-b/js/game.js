@@ -42,8 +42,6 @@ class Game {
   }
 
   init() {
-    this.setState(this.state);
-    this.enableInteraction();
     this.initScore();
   }
 
@@ -105,6 +103,8 @@ class Game {
       case STATE_PLAY :
         //  check score
       break;
+
+      // TODO for PLAY and next states
     }
   }
 
