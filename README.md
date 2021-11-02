@@ -19,3 +19,6 @@
 
 
 ### [Project E](project-e/)
+
+- [ ] Complete all states
+- [ ] Handle Arduino LEDs
