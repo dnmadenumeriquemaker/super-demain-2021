@@ -6,6 +6,12 @@ document.addEventListener("DOMContentLoaded", function() {
   //game.setState(STATE_WAIT);
   game.setState(STATE_PLAY);
 
+  const serial = new WebSerial()
+        serial.on('connect', () => console.log('Serial connected'))
+        serial.on('disconnect', () => console.log('Serial disconnected'))
+        serial.on('data', data => console.log(`Data received: ${data}`))
+        document.body.addEventListener('click', () => serial.write('Hello WebSerial'))
+
   document.addEventListener('keydown', function(e) {
     if (e.which == 39) {
       if (game.isState(STATE_PLAY)) {

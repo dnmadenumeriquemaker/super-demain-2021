@@ -39,16 +39,27 @@
       player, game images and questions/choices are here
     -->
     <section class="state-screen" data-state-screen="play">
+      <div class="play-transition"></div>
+
       <div class="play-background"></div>
+      <div class="play-background-cache"></div>
+      <div class="play-cloud play-cloud-1"></div>
+      <div class="play-cloud play-cloud-2"></div>
+      <div class="play-cloud play-cloud-3"></div>
+      <div class="play-cloud play-cloud-4"></div>
+
+      <div class="play-helper"></div>
+
+      <!--
       <div class="play-foreground">
         <div class="npc" id="npc1"></div>
       </div>
       <div class="play-player"></div>
-
+      -->
 
       <article class="play-step" data-play-step-id="1" data-right-choice="1">
         <div class="question">
-          Et le jour où tu es coincé seul sur une île déserte, tu vas faire quoi ?
+          Je veux souhaiter<br>l’anniversaire<br>de ma grand-mère
         </div>
         <div class="choice choice-left" data-right-choice>
           J'envoie un message à mes potes pour les prévenir
@@ -102,9 +113,14 @@
 
   <div id="phone">
     <div id="score"></div>
-    <div id="score-bar"></div>
+    <div id="score-bar">
+      <div class="phone-wave phone-wave2"></div>
+      <div class="phone-wave phone-wave1"></div>
+    </div>
 
     <div id="phone-dead" data-show-if-lost>X(</div>
+    <div id="phone-right-choice"></div>
+    <div id="phone-wrong-choice"></div>
   </div>
 
 
@@ -113,6 +129,7 @@
 
   <script type="text/javascript" src="js/jquery.js"></script>
   <script type="text/javascript" src="js/jquery-ui.js"></script>
+  <script type="text/javascript" src="js/webserial.min.js"></script>
   <script type="text/javascript" src="js/game.js"></script>
   <script type="text/javascript" src="js/js.js"></script>
 </body>

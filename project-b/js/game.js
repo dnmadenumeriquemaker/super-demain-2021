@@ -5,16 +5,18 @@ const STATE_WAIT = 'wait',
       STATE_LOST = 'lost',
       STATE_OUTRO = 'outro';
 
-const PLAY_STEP_STATE_TRANSITION = 'transition',
+const PLAY_STEP_STATE_INTRO_TRANSITION = 'intro-transition',
       PLAY_STEP_STATE_SHOW_QUESTION = 'show-question',
       PLAY_STEP_STATE_SHOW_CHOICES = 'show-choices',
       PLAY_STEP_STATE_LISTEN_TO_USER = 'listen-to-user',
       PLAY_STEP_STATE_RIGHT_CHOICE = 'right-choice',
-      PLAY_STEP_STATE_WRONG_CHOICE = 'wrong-choice';
+      PLAY_STEP_STATE_WRONG_CHOICE = 'wrong-choice',
+      PLAY_STEP_STATE_OUTRO_TRANSITION = 'outro-transition';
 
-const DURATION_TRANSITION_TO_NEXT_PLAY_STEP = 3000,
-      DURATION_SHOW_QUESTION = 3000,
-      DURATION_SHOW_ANSWER = 5000,
+const DURATION_BETWEEN_INTRO_TRANSITION_AND_QUESTION = 4000, // Durée de la transition
+      DURATION_BETWEEN_QUESTION_AND_CHOICES = 2000, // Durée de la question
+      DURATION_BETWEEN_ANSWER_AND_OUTRO_TRANSITION = 2000, // Durée de l'affichage de la bonne réponse
+      DURATION_BETWEEN_OUTRO_TRANSITION_AND_INTRO_TRANSITION = 1000, // Durée de l'affichage de l'animation selon la réponse de l'user
       DURATION_BEFORE_LOST = 1500,
       DURATION_OUTRO_TO_NEXT_GAME = 10000;
 
@@ -112,7 +114,7 @@ class Game {
   setPlayStepId(stepId) {
     this.playStepId = stepId;
     this.$body.setAttribute('data-play-step-id', this.playStepId);
-    this.setPlayStepState(PLAY_STEP_STATE_TRANSITION);
+    this.setPlayStepState(PLAY_STEP_STATE_INTRO_TRANSITION);
   }
 
   setNextPlayStep() {
@@ -125,28 +127,29 @@ class Game {
 
     // when the game starts,
     // playStep #0 is only a transition to playStep #1
+    // TODO : listen to Arduino (no auto play)
 
     if (this.playStepId == 0) {
       this.setTimerPlayStep(function(){
         _this.setNextPlayStep();
-      }, DURATION_TRANSITION_TO_NEXT_PLAY_STEP);
+      }, DURATION_BETWEEN_INTRO_TRANSITION_AND_QUESTION);
       return;
     }
 
     switch (state) {
-      case PLAY_STEP_STATE_TRANSITION :
+      case PLAY_STEP_STATE_INTRO_TRANSITION :
         this.stopTimerScore();
         this.disableInteraction();
         this.setTimerPlayStep(function(){
           _this.setPlayStepState(PLAY_STEP_STATE_SHOW_QUESTION);
-        }, DURATION_TRANSITION_TO_NEXT_PLAY_STEP);
+        }, DURATION_BETWEEN_INTRO_TRANSITION_AND_QUESTION);
       break;
 
       case PLAY_STEP_STATE_SHOW_QUESTION :
         this.disableInteraction();
         this.setTimerPlayStep(function(){
           _this.setPlayStepState(PLAY_STEP_STATE_SHOW_CHOICES);
-        }, DURATION_SHOW_QUESTION);
+        }, DURATION_BETWEEN_QUESTION_AND_CHOICES);
       break;
 
       case PLAY_STEP_STATE_SHOW_CHOICES :
@@ -167,8 +170,8 @@ class Game {
         this.setTimerPlayStep(function(){
           // TODO : ask for button action instead of timer?
           // TODO : wait for unplug instead of time?
-          _this.setNextPlayStep();
-        }, DURATION_SHOW_ANSWER);
+          _this.setPlayStepState(PLAY_STEP_STATE_OUTRO_TRANSITION);
+        }, DURATION_BETWEEN_ANSWER_AND_OUTRO_TRANSITION);
       break;
 
       case PLAY_STEP_STATE_WRONG_CHOICE :
@@ -180,8 +183,14 @@ class Game {
         this.setTimerPlayStep(function(){
           // TODO : ask for button action instead of timer?
           // TODO : wait for unplug instead of time?
+          _this.setPlayStepState(PLAY_STEP_STATE_OUTRO_TRANSITION);
+        }, DURATION_BETWEEN_ANSWER_AND_OUTRO_TRANSITION);
+      break;
+
+      case PLAY_STEP_STATE_OUTRO_TRANSITION :
+        this.setTimerPlayStep(function(){
           _this.setNextPlayStep();
-        }, DURATION_SHOW_ANSWER);
+        }, DURATION_BETWEEN_OUTRO_TRANSITION_AND_INTRO_TRANSITION);
       break;
     }
 
@@ -231,7 +240,7 @@ class Game {
 
   displayScore() {
     this.$score.innerHTML = this.score;
-    this.$scoreBar.style.height = (this.score / SCORE_MAX * 100) + '%';
+    this.$scoreBar.style.top = (SCORE_MAX - this.score) + '%';
     this.$body.setAttribute('data-score', this.score);
   }
 
