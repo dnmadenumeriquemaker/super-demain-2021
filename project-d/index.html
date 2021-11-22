@@ -12,7 +12,108 @@
 
 <body>
 
-  
+  <div id="game">
+    <section class="state-screen" data-state-screen="wait">
+
+    </section>
+
+    <section class="state-screen" data-state-screen="cart">
+      <div class="cart-item"></div>
+      <div class="cart-modal-scan"></div>
+
+      <div id="cart-total">0</div>
+
+      <div id="cart-datas">
+
+      </div>
+
+      <div id="cart-warning-cache"></div>
+      <div id="cart-warning">
+        <div class="cart-warning-message" data-when-item="1">
+          <p>
+            Dites-donc,<br>
+            c’est tout ce que vous pouvez<br>
+            donner pour acheter une voiture ?
+          </p>
+          <p>Vous êtes sûr.e ?</p>
+        </div>
+        <div class="cart-warning-message" data-when-item="2">
+          <p>
+            Dites-donc,<br>
+            c’est tout ce que vous pouvez<br>
+            donner pour acheter des écouteurs ?
+          </p>
+          <p>Vous êtes sûr.e ?</p>
+        </div>
+        <div class="cart-warning-message" data-when-item="3">
+          <p>
+            Dites-donc,<br>
+            c’est tout ce que vous pouvez<br>
+            donner pour acheter ce téléphone ?
+          </p>
+          <p>Vous êtes sûr.e ?</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="state-screen" data-state-screen="checkout">
+      <div id="checkout-progress-bar"></div>
+    </section>
+
+    <section class="state-screen" data-state-screen="outro">
+      <div id="outro-text">Texte long</div>
+    </section>
+
+  </div>
+
+  <div id="datas">
+    <div class="data" data-data-id="1" data-data-price="10">
+      <div class="data-name">Nom/prénom</div>
+      <div class="data-price">10</div>
+    </div>
+
+    <div class="data" data-data-id="2" data-data-price="10">
+      <div class="data-name">Groupe sanguin</div>
+      <div class="data-price">10</div>
+    </div>
+
+    <div class="data" data-data-id="3" data-data-price="10">
+      <div class="data-name">Poids</div>
+      <div class="data-price">10</div>
+    </div>
+
+    <div class="data" data-data-id="4" data-data-price="30">
+      <div class="data-name">Adresse</div>
+      <div class="data-price">30</div>
+    </div>
+
+    <div class="data" data-data-id="5" data-data-price="30">
+      <div class="data-name">Panier d'achat en ligne</div>
+      <div class="data-price">30</div>
+    </div>
+
+    <div class="data" data-data-id="6" data-data-price="30">
+      <div class="data-name">Orientation sexuelle</div>
+      <div class="data-price">30</div>
+    </div>
+
+    <div class="data" data-data-id="7" data-data-price="90">
+      <div class="data-name">Arbre généalogique</div>
+      <div class="data-price">90</div>
+    </div>
+
+    <div class="data" data-data-id="8" data-data-price="90">
+      <div class="data-name">Situation finacière</div>
+      <div class="data-price">90</div>
+    </div>
+
+    <div class="data" data-data-id="9" data-data-price="90">
+      <div class="data-name">Galerie photo</div>
+      <div class="data-price">90</div>
+    </div>
+  </div>
+
+
 
   <script type="text/javascript" src="js/jquery.js"></script>
   <script type="text/javascript" src="js/jquery-ui.js"></script>
