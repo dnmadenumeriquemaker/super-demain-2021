@@ -1,25 +1,36 @@
 let game = new Game();
+const serial = new WebSerial();
 
 document.addEventListener("DOMContentLoaded", function() {
 
-  game.init();
-  game.setState(STATE_WAIT);
-
-  /*
-    if (game.isState(STATE_WAIT)) {
-      // detect 2, 3 or 4 buttons
-      // to go to game.setState(STATE_INTRO);
-    }
-  */
-
-
-  document.addEventListener('keydown', function(e) {
-    if (e.which == 39) {
-      if (game.isState(STATE_WAIT)) {
-        game.setPlayers([0,2,3]);
-        game.setNextState();
-      }
-    }
+  game.init({
+    serial: serial
   });
+  //game.setState(STATE_WAIT_FIRST_PLAYER);
+
+  serial.on('data', data => {
+    game.onData(data);
+  });
+
+  // DEV
+  Howler.volume(.2);
+
+  game.setState(STATE_WAIT_FIRST_PLAYER);
+  game.addPlayer(1);
+  game.addPlayer(2);
+  game.addPlayer(3);
+  game.addPlayer(4);
+  game.checkPlayersBeforeIntro();
+  game.setState(STATE_VOTE_ENDED);
+
+  let devButtons = document.getElementsByClassName('data-send-data');
+
+  [].forEach.call(devButtons, item => {
+    item.addEventListener('click', function() {
+      game.onData(this.textContent);
+    });
+  });
+
+  // /DEV
 
 });
