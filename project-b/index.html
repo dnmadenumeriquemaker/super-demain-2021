@@ -18,19 +18,7 @@
       you can put images and texts
     -->
     <section class="state-screen" data-state-screen="wait">
-      Le smartphone, objet total
-    </section>
 
-
-    <!--
-      Intro screen:
-      you can put game rules here
-    -->
-    <section class="state-screen" data-state-screen="intro">
-      Règles du jeu
-      <div data-show-if-can-interact-is="true">
-        Appuyez sur le bouton pour continuer
-      </div>
     </section>
 
 
@@ -41,14 +29,25 @@
     <section class="state-screen" data-state-screen="play">
       <div class="play-transition"></div>
 
-      <div class="play-background"></div>
+      <div class="play-background">
+        <div id="state-intro"></div>
+
+        <div id="play-jim-won"></div>
+
+        <div id="sparks"></div>
+      </div>
+
       <div class="play-background-cache"></div>
+
       <div class="play-cloud play-cloud-1"></div>
       <div class="play-cloud play-cloud-2"></div>
       <div class="play-cloud play-cloud-3"></div>
       <div class="play-cloud play-cloud-4"></div>
 
       <div class="play-helper"></div>
+
+
+
 
       <!--
       <div class="play-foreground">
@@ -59,55 +58,137 @@
 
       <article class="play-step" data-play-step-id="1" data-right-choice="1">
         <div class="question">
-          Je veux souhaiter<br>l’anniversaire<br>de ma grand-mère
+          Je dois me réveiller<br>à 8 heures
         </div>
         <div class="choice choice-left" data-right-choice>
-          J'envoie un message à mes potes pour les prévenir
+          J'utilise mon&nbsp;smartphone
         </div>
         <div class="choice choice-right" data-wrong-choice>
-          J'écris S.O.S dans le sable avec un bâton
+          J'attends le&nbsp;chant du&nbsp;coq
         </div>
       </article>
-
 
       <article class="play-step" data-play-step-id="2" data-right-choice="2">
         <div class="question">
-          Vous faites quoi avec votre téléphone au magasin ?
+          Je veux connaître mon&nbsp;poids
         </div>
         <div class="choice choice-left" data-wrong-choice>
-          Choix 1
+          J'utilise mon&nbsp;smartphone
         </div>
         <div class="choice choice-right" data-right-choice>
-          Choix 2
+          J'utilise ma&nbsp;balance
+        </div>
+      </article>
+
+      <article class="play-step" data-play-step-id="3" data-right-choice="1">
+        <div class="question">
+          Pendant mon petit dèj,<br>je&nbsp;m'informe des&nbsp;actualités du&nbsp;jour
+        </div>
+        <div class="choice choice-left" data-right-choice>
+          J'utilise mon&nbsp;smartphone
+        </div>
+        <div class="choice choice-right" data-wrong-choice>
+          J'attends le&nbsp;vendeur à&nbsp;la&nbsp;criée
+        </div>
+      </article>
+
+      <article class="play-step" data-play-step-id="4" data-right-choice="1">
+        <div class="question">
+          Je veux souhaiter<br>l’anniversaire<br>de ma grand-mère
+        </div>
+        <div class="choice choice-left" data-right-choice>
+          J'utilise mon&nbsp;smartphone
+        </div>
+        <div class="choice choice-right" data-wrong-choice>
+          J'envoie un&nbsp;pigeon&nbsp;voyageur
+        </div>
+      </article>
+
+      <article class="play-step" data-play-step-id="5" data-right-choice="1">
+        <div class="question">
+          Je veux écouter<br>de&nbsp;la&nbsp;musique
+        </div>
+        <div class="choice choice-left" data-right-choice>
+          J'utilise mon&nbsp;smartphone
+        </div>
+        <div class="choice choice-right" data-wrong-choice>
+          J'invite le&nbsp;chanteur chez&nbsp;moi
+        </div>
+      </article>
+
+      <article class="play-step" data-play-step-id="6" data-right-choice="2">
+        <div class="question">
+          Il&nbsp;pleut&nbsp;dehors…
+        </div>
+        <div class="choice choice-left" data-wrong-choice>
+          J'utilise mon&nbsp;smartphone
+        </div>
+        <div class="choice choice-right" data-right-choice>
+          J'utilise un&nbsp;parapluie
+        </div>
+      </article>
+
+      <article class="play-step" data-play-step-id="7" data-right-choice="1">
+        <div class="question">
+          Je suis perdu<br>en&nbsp;forêt
+        </div>
+        <div class="choice choice-left" data-right-choice>
+          J'utilise mon&nbsp;smartphone
+        </div>
+        <div class="choice choice-right" data-wrong-choice>
+          Je&nbsp;mange de&nbsp;l'écorce d'arbre pour&nbsp;survivre
+        </div>
+      </article>
+
+      <article class="play-step" data-play-step-id="8" data-right-choice="2">
+        <div class="question">
+          Je&nbsp;veux&nbsp;pêcher
+        </div>
+        <div class="choice choice-left" data-wrong-choice>
+          J'utilise mon&nbsp;smartphone
+        </div>
+        <div class="choice choice-right" data-right-choice>
+          J'utilise une&nbsp;canne à&nbsp;pêche
+        </div>
+      </article>
+
+      <article class="play-step" data-play-step-id="9" data-right-choice="1">
+        <div class="question">
+          Je&nbsp;veux connaître l'heure&nbsp;exacte, mais&nbsp;j'ai&nbsp;oublié ma&nbsp;montre…
+        </div>
+        <div class="choice choice-left" data-right-choice>
+          J'utilise mon&nbsp;smartphone
+        </div>
+        <div class="choice choice-right" data-wrong-choice>
+          Je&nbsp;regarde le&nbsp;soleil
+        </div>
+      </article>
+
+
+      <article class="play-step" data-play-step-id="10" data-right-choice="2">
+        <div class="question">
+          Je&nbsp;me&nbsp;suis&nbsp;cogné l'orteil au&nbsp;coin du&nbsp;lit
+        </div>
+        <div class="choice choice-left" data-wrong-choice>
+          J'utilise mon&nbsp;smartphone
+        </div>
+        <div class="choice choice-right" data-right-choice>
+          J'applique de&nbsp;la&nbsp;glace
         </div>
       </article>
 
     </section>
 
 
-    <!--
-      Won screen
-    -->
-    <section class="state-screen" data-state-screen="won">
-      Gagné !
-    </section>
 
 
     <!--
       Lost screen
     -->
     <section class="state-screen" data-state-screen="lost">
-      Perdu !
+      <div id="play-jim-lost"></div>
     </section>
 
-
-    <!--
-      Outro screen:
-      end of the game
-    -->
-    <section class="state-screen" data-state-screen="outro">
-      Conclusion et fin de l'expérience
-    </section>
   </div>
 
 
@@ -118,13 +199,13 @@
       <div class="phone-wave phone-wave1"></div>
     </div>
 
-    <div id="phone-dead" data-show-if-lost>X(</div>
+    <div id="phone-dead" data-show-if-lost></div>
+    <div id="phone-won" data-show-if-won></div>
+    <div id="phone-abort"></div>
+
     <div id="phone-right-choice"></div>
     <div id="phone-wrong-choice"></div>
   </div>
-
-
-  <!-- TODO : preload all images -->
 
 
   <script type="text/javascript" src="js/jquery.js"></script>

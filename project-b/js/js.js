@@ -1,16 +1,24 @@
 let game = new Game();
+const serial = new WebSerial({
+  log: true
+});
 
 document.addEventListener("DOMContentLoaded", function() {
 
-  game.init();
-  //game.setState(STATE_WAIT);
-  game.setState(STATE_PLAY);
+  game.init({
+    serial: serial
+  });
 
-  const serial = new WebSerial()
-        serial.on('connect', () => console.log('Serial connected'))
-        serial.on('disconnect', () => console.log('Serial disconnected'))
-        serial.on('data', data => console.log(`Data received: ${data}`))
-        document.body.addEventListener('click', () => serial.write('Hello WebSerial'))
+  setTimeout(function(){
+    game.setState(STATE_WAIT);
+/*
+    game.setState(STATE_PLAY);
+    game.setPlayStepId(8);*/
+  },1000);
+
+  serial.on('data', data => {
+    game.onData(data);
+  });
 
   document.addEventListener('keydown', function(e) {
     if (e.which == 39) {

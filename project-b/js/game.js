@@ -2,8 +2,7 @@ const STATE_WAIT = 'wait',
       STATE_INTRO = 'intro',
       STATE_PLAY = 'play',
       STATE_WON = 'won',
-      STATE_LOST = 'lost',
-      STATE_OUTRO = 'outro';
+      STATE_LOST = 'lost';
 
 const PLAY_STEP_STATE_INTRO_TRANSITION = 'intro-transition',
       PLAY_STEP_STATE_SHOW_QUESTION = 'show-question',
@@ -16,9 +15,15 @@ const PLAY_STEP_STATE_INTRO_TRANSITION = 'intro-transition',
 const DURATION_BETWEEN_INTRO_TRANSITION_AND_QUESTION = 4000, // Durée de la transition
       DURATION_BETWEEN_QUESTION_AND_CHOICES = 2000, // Durée de la question
       DURATION_BETWEEN_ANSWER_AND_OUTRO_TRANSITION = 2000, // Durée de l'affichage de la bonne réponse
-      DURATION_BETWEEN_OUTRO_TRANSITION_AND_INTRO_TRANSITION = 1000, // Durée de l'affichage de l'animation selon la réponse de l'user
+      DURATION_BETWEEN_OUTRO_TRANSITION_AND_INTRO_TRANSITION = 4000, // Durée de l'affichage de l'animation selon la réponse de l'user
       DURATION_BEFORE_LOST = 1500,
-      DURATION_OUTRO_TO_NEXT_GAME = 10000;
+      DURATION_OUTRO_TO_NEXT_GAME = 10000,
+
+      DURATION_TIMEOUT_PROMPT = 30000,
+
+      DURATION_WON = 10000,
+      DURATION_LOST = 5000;
+
 
 const SCORE_MAX = 100,
       BONUS = 10,
@@ -27,6 +32,8 @@ const SCORE_MAX = 100,
 
 class Game {
   constructor() {
+    this.serial;
+
     this.playStepId;
     this.interactionEnabled;
     this.score;
@@ -34,6 +41,8 @@ class Game {
     this.timerInteraction = null;
     this.timerPlayStep = null;
     this.timerScore = null;
+    this.timerTimeout = null;
+    this.timerState = null;
 
     this.nbQuestions = NB_QUESTIONS;
     this.scoreMax = SCORE_MAX;
@@ -43,36 +52,62 @@ class Game {
     this.$scoreBar = document.getElementById('score-bar');
   }
 
-  init() {
+  init(params = {}) {
+    if (params.serial) this.serial = params.serial;
+    this.initGame();
+  }
+
+  initGame() {
     this.initScore();
   }
 
   setState(state) {
+    const _this = this;
     this.state = state;
     this.$body.setAttribute('data-state', this.state);
 
     switch (this.state) {
       case STATE_WAIT :
+        clearTimeout(this.timerState);
+        this.initGame();
         this.enableInteraction();
+        this.writeData('state/wait');
       break;
 
       case STATE_INTRO :
-        this.disableAndWaitBeforeNextInteraction();
+        this.writeData('state/intro');
       break;
 
       case STATE_PLAY :
         this.disableInteraction();
         this.setPlayStepId(0);
+        this.writeData('state/play');
       break;
 
-      case STATE_WON : // TODO : not tested yet
+      case STATE_WON :
         this.disableInteraction();
         this.clearTimerPlayStep();
+        this.writeData('state/won');
+
+        clearTimeout(this.timerState);
+        clearTimeout(this.timerTimeout);
+
+        this.timerState = setTimeout(function(){
+          _this.setState(STATE_WAIT);
+        }, DURATION_WON);
       break;
 
       case STATE_LOST :
         this.disableInteraction();
         this.clearTimerPlayStep();
+        this.writeData('state/lost');
+
+        clearTimeout(this.timerState);
+        clearTimeout(this.timerTimeout);
+
+        this.timerState = setTimeout(function(){
+          _this.setState(STATE_WAIT);
+        }, DURATION_LOST);
       break;
 
     }
@@ -91,8 +126,6 @@ class Game {
   }
 
   setNextState() {
-    if (!this.canInteract()) return;
-
     switch (this.state) {
       case STATE_WAIT :
         this.setState(STATE_INTRO);
@@ -103,11 +136,41 @@ class Game {
       break;
 
       case STATE_PLAY :
-        //  check score
+        this.setState(STATE_WON);
       break;
-
-      // TODO for PLAY and next states
     }
+  }
+
+
+  onData(rawData) {
+    let data = rawData.trim();
+
+    console.log('onData', data);
+
+    let parts = data.split('/');
+
+    if (this.isState(STATE_WAIT) && data == 'plugged') {
+      this.setNextState();
+    }
+
+    else if (this.isState(STATE_INTRO) && data == 'unplugged') {
+      this.setNextState();
+    }
+
+    else if (this.isState(STATE_PLAY) && this.canInteract()) {
+      if (parts[0] == 'choice') {
+        if (parts[1] == 'left') {
+          this.selectChoice(1);
+        } else if (parts[1] == 'right') {
+          this.selectChoice(2);
+        }
+      }
+    }
+  }
+
+  writeData(data) {
+    console.log('writeData', data);
+    serial.write(data);
   }
 
 
@@ -119,7 +182,12 @@ class Game {
 
   setNextPlayStep() {
     this.playStepId++;
-    this.setPlayStepId(this.playStepId);
+
+    if (this.playStepId > 10) {
+      this.setNextState();
+    } else {
+      this.setPlayStepId(this.playStepId);
+    }
   }
 
   setPlayStepState(state) {
@@ -132,7 +200,7 @@ class Game {
     if (this.playStepId == 0) {
       this.setTimerPlayStep(function(){
         _this.setNextPlayStep();
-      }, DURATION_BETWEEN_INTRO_TRANSITION_AND_QUESTION);
+      }, 100);
       return;
     }
 
@@ -157,38 +225,43 @@ class Game {
       break;
 
       case PLAY_STEP_STATE_LISTEN_TO_USER :
+        this.writeData('F');
         this.enableInteraction();
         this.startTimerScore();
+        this.timerTimeout = setTimeout(function(){
+          _this.setState(STATE_WAIT);
+        }, DURATION_TIMEOUT_PROMPT);
       break;
 
       case PLAY_STEP_STATE_RIGHT_CHOICE :
+        clearTimeout(this.timerTimeout);
+        this.writeData('G');
         this.stopTimerScore();
         this.disableInteraction();
         this.setDataAnswer('right');
         this.addBonus();
 
         this.setTimerPlayStep(function(){
-          // TODO : ask for button action instead of timer?
-          // TODO : wait for unplug instead of time?
           _this.setPlayStepState(PLAY_STEP_STATE_OUTRO_TRANSITION);
         }, DURATION_BETWEEN_ANSWER_AND_OUTRO_TRANSITION);
       break;
 
       case PLAY_STEP_STATE_WRONG_CHOICE :
+        clearTimeout(this.timerTimeout);
+        this.writeData('H');
         this.stopTimerScore();
         this.disableInteraction();
         this.setDataAnswer('wrong');
         this.addMalus();
 
         this.setTimerPlayStep(function(){
-          // TODO : ask for button action instead of timer?
-          // TODO : wait for unplug instead of time?
           _this.setPlayStepState(PLAY_STEP_STATE_OUTRO_TRANSITION);
         }, DURATION_BETWEEN_ANSWER_AND_OUTRO_TRANSITION);
       break;
 
       case PLAY_STEP_STATE_OUTRO_TRANSITION :
         this.setTimerPlayStep(function(){
+          _this.writeData('I');
           _this.setNextPlayStep();
         }, DURATION_BETWEEN_OUTRO_TRANSITION_AND_INTRO_TRANSITION);
       break;
@@ -222,6 +295,10 @@ class Game {
   initScore() {
     this.score = SCORE_MAX;
     this.displayScore();
+    this.stopTimerScore();
+    for (let i = 1; i <= 10; i++) {
+      this.$body.setAttribute('data-question-'+i, '');
+    }
   }
 
   addMalus() {

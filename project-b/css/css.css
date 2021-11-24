@@ -26,14 +26,52 @@ body {
   overflow:hidden;
 }
 
+#sparks {
+  position:absolute;
+  top: 0;
+  left: -1900px;
+  width: 610px;
+  height: 485px;
+  background:url(../assets/sparks.gif) no-repeat center / contain;
+}
+
+body[data-state="play"][data-play-step-id="1"][data-question-1="wrong"] #sparks { top: 113px; left:2112px; }
+body[data-state="play"][data-play-step-id="2"][data-question-2="wrong"] #sparks { top: -86px; left: 4654px; }
+body[data-state="play"][data-play-step-id="3"][data-question-3="wrong"] #sparks { top: -86px; left:6533px; }
+body[data-state="play"][data-play-step-id="4"][data-question-4="wrong"] #sparks { top: 26px; left: 8220px; }
+body[data-state="play"][data-play-step-id="5"][data-question-5="wrong"] #sparks { top: -186px; left: 10150px; }
+body[data-state="play"][data-play-step-id="6"][data-question-6="wrong"] #sparks { top: 105px; left: 12200px; }
+body[data-state="play"][data-play-step-id="7"][data-question-7="wrong"] #sparks { top: 305px; left: 14105px; }
+body[data-state="play"][data-play-step-id="8"][data-question-8="wrong"] #sparks { top: 35px; left: 15319px; }
+body[data-state="play"][data-play-step-id="9"][data-question-9="wrong"] #sparks { top: 35px; left: 17951px; }
+body[data-state="play"][data-play-step-id="10"][data-question-10="wrong"] #sparks { top: -109px; left: 19951px; }
+
+#play-jim-won {
+  position:absolute;
+  top: 491px;
+  left: 21912px;
+  width: 248px;
+  height: 922px;
+  background:url(../assets/jim-won.gif) no-repeat center / contain;
+}
+
+#play-jim-lost {
+  position:absolute;
+  top: 456px;
+  left: 851px;
+  width: 259px;
+  height: 922px;
+  background:url(../assets/jim-lost.gif) no-repeat center / contain;
+}
+
 #phone {
-  width:182px;
+  width:202px;
   height:352px;
   background:#96D3E1;
   position:absolute;
   top:705px;
   /* right:214px; */
-  left:1695px;
+  left:1675px;
   overflow:hidden;
   transform:rotateZ(10deg);
   z-index:123456789;
@@ -45,7 +83,7 @@ body {
   left:0;
   right:0;
   bottom:0;
-  background:red;
+  background:url(../assets/lost.gif) no-repeat center / cover;
   color:white;
   font-size:100px;
   z-index:1000;
@@ -53,6 +91,43 @@ body {
 }
 
 body[data-state="lost"] #phone-dead {
+  opacity:1;
+}
+
+#phone-won {
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  bottom:0;
+  background:url(../assets/won.gif) no-repeat center / cover;
+  color:white;
+  font-size:100px;
+  z-index:1000;
+  opacity:0;
+}
+
+body[data-state="wait"] #phone-won,
+body[data-state="intro"] #phone-won,
+body[data-state="play"][data-play-step-id="0"] #phone-won,
+body[data-state="won"] #phone-won {
+  opacity:1;
+}
+
+#phone-abort {
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  bottom:0;
+  background:url(../assets/abort.gif) no-repeat center / cover;
+  color:white;
+  font-size:100px;
+  z-index:1000;
+  opacity:0;
+}
+
+body[data-abort="true"] #phone-abort {
   opacity:1;
 }
 
@@ -186,6 +261,30 @@ body[data-state="play"][data-play-step-id="7"] .play-background { left:-700%; }
 body[data-state="play"][data-play-step-id="8"] .play-background { left:-800%; }
 body[data-state="play"][data-play-step-id="9"] .play-background { left:-900%; }
 body[data-state="play"][data-play-step-id="10"] .play-background { left:-1000%; }
+body[data-state="won"] .play-background { left:-1100%; }
+
+body[data-state="wait"] .play-background {
+  transition:none;
+}
+body[data-state="play"][data-play-step-id="1"][data-question-1="wrong"][data-play-step-state="outro-transition"] .play-background,
+body[data-state="play"][data-play-step-id="2"][data-question-2="wrong"][data-play-step-state="outro-transition"] .play-background,
+body[data-state="play"][data-play-step-id="3"][data-question-3="wrong"][data-play-step-state="outro-transition"] .play-background,
+body[data-state="play"][data-play-step-id="4"][data-question-4="wrong"][data-play-step-state="outro-transition"] .play-background,
+body[data-state="play"][data-play-step-id="5"][data-question-5="wrong"][data-play-step-state="outro-transition"] .play-background,
+body[data-state="play"][data-play-step-id="6"][data-question-6="wrong"][data-play-step-state="outro-transition"] .play-background,
+body[data-state="play"][data-play-step-id="7"][data-question-7="wrong"][data-play-step-state="outro-transition"] .play-background,
+body[data-state="play"][data-play-step-id="8"][data-question-8="wrong"][data-play-step-state="outro-transition"] .play-background,
+body[data-state="play"][data-play-step-id="9"][data-question-9="wrong"][data-play-step-state="outro-transition"] .play-background,
+body[data-state="play"][data-play-step-id="10"][data-question-10="wrong"][data-play-step-state="outro-transition"] .play-background {
+  filter:grayscale(100%);
+  animation: backgroundWrong 600ms linear 5 forwards 500ms;
+}
+
+
+@keyframes backgroundWrong {
+         20%, 39%,      60%, 79%, 100% { filter:grayscale(0%) contrast(100%); }
+   0%, 19%,      40%, 59%,     80%, 99% { filter:grayscale(100%) contrast(500%); }
+}
 
 
 .play-cloud {
@@ -226,6 +325,23 @@ body[data-state="play"][data-play-step-state="show-choices"] .play-cloud,
 body[data-state="play"][data-play-step-state="right-choice"] .play-cloud,
 body[data-state="play"][data-play-step-state="wrong-choice"] .play-cloud {
   left:0;
+}
+
+#state-intro {
+  position:absolute;
+  top:0;
+  left:0;
+  width:1920px;
+  height:100%;
+  background:url(../assets/intro.png) no-repeat center / cover;
+  display:none;
+  z-index:100;
+}
+
+body[data-state="intro"] #state-intro,
+body[data-state="play"][data-play-step-id="0"] #state-intro,
+body[data-state="play"][data-play-step-id="1"] #state-intro {
+  display:block;
 }
 
 /* DEV ONLY */
@@ -274,7 +390,8 @@ body[data-state="play"][data-play-step-state="wrong-choice"] .play-background-ca
 }
 
 body[data-state="play"][data-play-step-state="intro-transition"] .play-transition,
-body[data-state="play"][data-play-step-state="show-question"] .play-transition {
+body[data-state="play"][data-play-step-state="show-question"] .play-transition,
+body[data-state="won"] .play-transition {
   left:-100%;
   transition:all 4000ms cubic-bezier(.2,0,.6,1);
   /*cubic-bezier(0.225, 0.000, 0.355, 1.000);*/
@@ -434,7 +551,7 @@ body[data-state="play"][data-play-step-id="20"] .play-step[data-play-step-id="20
   font-weight:bold;
   position:absolute;
   top:64px;
-  width:1000px;
+  width:1111px;
   left:42%;
   right:64px;
   opacity:0;
@@ -462,9 +579,9 @@ body[data-state="play"][data-play-step-state="wrong-choice"] .question {
   text-align:center;
   font-weight:bold;
   top: 800px;
-  max-width: 410px;
+  max-width: 580px;
   width: 100%;
-  font-size: 46px;
+  font-size: 66px;
   text-align:center;
   opacity:0;
   padding:48px;
@@ -521,14 +638,22 @@ body[data-state="play"][data-play-step-state="wrong-choice"] .choice[data-wrong-
   left:0;
   bottom:0;
   right:0;
-  background:white;
+  background:#261D4B;
   display:none;
 }
 
+.state-screen[data-state-screen="lost"] {
+  background:url(../assets/lost.png) no-repeat center / cover;
+}
+
+/*
 body[data-state="wait"] .state-screen[data-state-screen="wait"],
 body[data-state="intro"] .state-screen[data-state-screen="intro"],
+*/
+body[data-state="wait"] .state-screen[data-state-screen="play"],
+body[data-state="intro"] .state-screen[data-state-screen="play"],
 body[data-state="play"] .state-screen[data-state-screen="play"],
-body[data-state="won"] .state-screen[data-state-screen="won"],
+body[data-state="won"] .state-screen[data-state-screen="play"],
 body[data-state="lost"] .state-screen[data-state-screen="lost"],
 body[data-state="outro"] .state-screen[data-state-screen="outro"] {
   display:block;
