@@ -18,7 +18,7 @@ const DURATION_WAIT_FIRST_PLAYER_LOOP = 30000, // Temps entre chaque répétitio
 let   AUDIO_WAIT_FIRST_PLAYER = 'WAIT_FIRST_PLAYER',
       AUDIO_WAIT_MORE_PLAYERS = 'WAIT_MORE_PLAYERS', // TO DO
       AUDIO_INTRO = 'INTRO',
-      AUDIO_VOTE_PICK_THEME = 'VOTE-P', // 1, 2, 3, 4
+      AUDIO_VOTE_PICK_THEME = 'VOTE_P', // 1, 2, 3, 4
       AUDIO_VOTE_START_TIMER = 'VOTE_START_TIMER',
       AUDIO_VOTE_ENDED = 'VOTE_ENDED',
       AUDIO_TALK_START = 'TALK_START_P', // 1, 2, 3, 4
@@ -58,6 +58,7 @@ class Game {
 
   setState(state) {
     let _this = this;
+
     this.state = state;
     this.$body.setAttribute('data-state', this.state);
 
@@ -65,11 +66,16 @@ class Game {
       case STATE_WAIT_FIRST_PLAYER :
         clearTimeout(this.timerState);
 
+        this.writeData("state/waitfirstplayer");
+
         this.initGame();
         this.loopAudioWithDelay(AUDIO_WAIT_FIRST_PLAYER, DURATION_WAIT_FIRST_PLAYER_LOOP);
       break;
 
       case STATE_WAIT_MORE_PLAYERS :
+
+        this.writeData("state/waitmoreplayers");
+
         this.playAudioThen(AUDIO_WAIT_MORE_PLAYERS, function(){
           _this.doThisAfterDelay(function(){
             _this.checkPlayersBeforeIntro();
@@ -79,6 +85,8 @@ class Game {
 
       case STATE_INTRO :
         clearTimeout(this.timerState);
+
+        this.writeData("state/intro");
 
         this.playAudioThen(AUDIO_INTRO, function(){
           _this.setNextState();
@@ -91,12 +99,17 @@ class Game {
         // choose random alive player
         let randomAlivePlayer = this.getRandomAlivePlayer();
 
+        this.writeData("state/votepicktheme");
+        this.writeData("player/"+randomAlivePlayer);
+
         this.playAudioThen(AUDIO_VOTE_PICK_THEME + randomAlivePlayer, function(){
           _this.setNextStateAfterDelay(DURATION_NEW_THEME_READING);
         });
       break;
 
       case STATE_LISTEN_TO_VOTES :
+        this.writeData("state/listentovotes");
+
         this.playAudio(AUDIO_VOTE_START_TIMER);
         this.setNextStateAfterDelay(DURATION_TIMER_VOTE);
       break;
@@ -104,17 +117,22 @@ class Game {
       case STATE_VOTE_ENDED :
         clearTimeout(this.timerState);
 
+        this.writeData("state/voteended");
+
         this.playAudioThen(AUDIO_VOTE_ENDED, function(){
           _this.setNextState();
         });
       break;
 
       case STATE_TALK :
+        this.writeData("state/talk");
         this.checkNextTalk();
       break;
 
       case STATE_OUTRO :
         clearTimeout(this.timerState);
+
+        this.writeData("state/outro");
 
         this.playAudioThen(AUDIO_OUTRO, function(){
           _this.setNextStateAfterDelay(DURATION_OUTRO_TO_NEXT_GAME);
@@ -150,6 +168,8 @@ class Game {
 
     this.players[player].hasTalked = true;
     this.currentPlayerTalking = player;
+
+    this.writeData("player/" + player);
   }
 
   listenToTalk() {
@@ -266,7 +286,9 @@ class Game {
     return state == this.state;
   }
 
-  onData(data) {
+  onData(rawData) {
+    let data = rawData.trim();
+
     console.log('onData', data);
 
     let parts = data.split('/');
@@ -359,6 +381,7 @@ class Game {
   }
 
   writeData(data) {
+    console.log('Game -> Arduino', data);
     serial.write(data)
   }
 
@@ -480,13 +503,15 @@ class Game {
       this.alivePlayers.push(player);
       this.playersWhoCanTalk.push(player);
 
-      this.writeData("{player}/alive");
+      //this.writeData(player + "/alive");
 
+      // if this is the 1st player
       if (this.isState(STATE_WAIT_FIRST_PLAYER)) {
         this.setState(STATE_WAIT_MORE_PLAYERS);
-      } else if (this.isState(STATE_WAIT_MORE_PLAYERS)) {
-        // if this is the 2nd, 3rd or 4th player
+      }
 
+      // if this is the 2nd, 3rd or 4th player
+      else if (this.isState(STATE_WAIT_MORE_PLAYERS)) {
         // if this is the last player (4th),
         // let's go to next state
         if (this.alivePlayers.length == 4) {

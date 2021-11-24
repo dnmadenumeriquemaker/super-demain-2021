@@ -1,17 +1,23 @@
 let game = new Game();
-const serial = new WebSerial();
+const serial = new WebSerial({
+  log:true
+});
 
 document.addEventListener("DOMContentLoaded", function() {
 
   game.init({
     serial: serial
   });
-  //game.setState(STATE_WAIT_FIRST_PLAYER);
+
+  setTimeout(function(){
+    game.setState(STATE_WAIT_FIRST_PLAYER);
+  }, 1000);
 
   serial.on('data', data => {
     game.onData(data);
   });
 
+  /*
   // DEV
   Howler.volume(.2);
 
@@ -22,7 +28,7 @@ document.addEventListener("DOMContentLoaded", function() {
   game.addPlayer(4);
   game.checkPlayersBeforeIntro();
   game.setState(STATE_VOTE_ENDED);
-
+*/
   let devButtons = document.getElementsByClassName('data-send-data');
 
   [].forEach.call(devButtons, item => {
@@ -32,5 +38,6 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 
   // /DEV
+
 
 });
