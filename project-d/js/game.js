@@ -3,28 +3,29 @@ const STATE_WAIT = 'wait',
       STATE_CHECKOUT = 'checkout',
       STATE_OUTRO = 'outro';
 
-const BARCODE_ITEM_1 = 'item1',
-      BARCODE_ITEM_2 = 'item2',
-      BARCODE_ITEM_3 = 'item3',
+const BARCODE_ITEM_1 = '3',
+      BARCODE_ITEM_2 = '2',
+      BARCODE_ITEM_3 = '1',
 
-      BARCODE_DATA_1 = 'data1',
-      BARCODE_DATA_2 = 'data2',
-      BARCODE_DATA_3 = 'data3',
-      BARCODE_DATA_4 = 'data4',
-      BARCODE_DATA_5 = 'data5',
-      BARCODE_DATA_6 = 'data6',
-      BARCODE_DATA_7 = 'data7',
-      BARCODE_DATA_8 = 'data8',
-      BARCODE_DATA_9 = 'data9',
+      BARCODE_DATA_1 = 'ORIENT', // ok
+      BARCODE_DATA_2 = 'SANG', // ok
+      BARCODE_DATA_3 = 'POIDS', // ok
+      BARCODE_DATA_4 = 'FINANCEArrowDown', // ok
+      BARCODE_DATA_5 = 'PANIER', // ok
+      BARCODE_DATA_6 = 'NOM', // ok
+      BARCODE_DATA_7 = 'ARBRE', // ok
+      BARCODE_DATA_8 = 'SITUATION', // ok
+      BARCODE_DATA_9 = 'PHOTO', // ok
 
-      BARCODE_PASS = 'pass';
+      BARCODE_PASS = '123';
 
-const DURATION_CHECKOUT = 11000,
-      DURATION_OUTRO = 20000;
+const DURATION_CHECKOUT = 20000,
+      DURATION_OUTRO = 30000;
 
 class Game {
   constructor() {
     this.interactionEnabled;
+    this.serial;
 
     this.timerState = null;
 
@@ -42,7 +43,12 @@ class Game {
     this.$outroText = document.getElementById('outro-text');
   }
 
-  init() {
+  init(params = {}) {
+    if (params.serial) this.serial = params.serial;
+    this.initGame();
+  }
+
+  initGame() {
     this.resetCart();
     this.resetCode();
   }
@@ -54,6 +60,9 @@ class Game {
 
     switch (this.state) {
       case STATE_WAIT :
+        clearTimeout(this.timerState);
+
+        this.initGame();
         this.enableInteraction();
       break;
 
@@ -61,6 +70,9 @@ class Game {
         setTimeout(function(){
           _this.$progressBar.style.width = '1429px';
         },1);
+
+        let arduinoData = this.cart.join('');
+        this.writeData("C" + arduinoData);
 
         clearTimeout(this.timerState);
 
@@ -128,8 +140,20 @@ class Game {
     this.code = code;
     this.triggerCode();
   }
-
   // /dev
+
+  onData(rawData) {
+
+    let data = rawData.trim();
+
+    console.log('onData', data);
+
+    let parts = data.split('/');
+  }
+
+  writeData(data) {
+    serial.write(data);
+  }
 
   triggerCode() {
     console.log('code', this.code);
@@ -155,13 +179,15 @@ class Game {
         BARCODE_DATA_9,
       ].indexOf(this.code);
 
+      console.log(this.code);
+
       if (index != -1) {
         this.hideCartWarning();
 
         let dataCode = this.code;
         let dataId = index + 1;
 
-        let $data = document.querySelector('.data[data-data-id="' + dataId + '"]');
+        let $data = document.querySelector('#datas .data[data-data-id="' + dataId + '"]').cloneNode(true);
         let dataPrice = parseInt($data.getAttribute('data-data-price'));
 
         if (this.cart.indexOf(dataId) == -1) {
@@ -174,11 +200,12 @@ class Game {
           // remove from cart
           this.cart.splice(this.cart.indexOf(dataId), 1);
           this.cartTotal -= dataPrice;
-          this.$drawerDatas.appendChild($data);
+          document.querySelector('#cart-datas .data[data-data-id="' + dataId + '"]').remove();
         }
 
         this.displayCart();
       } else if (this.code == BARCODE_PASS) {
+        console.log(this.cartTotal);
         if (this.cartTotal >= 50) {
           this.setNextState();
         } else {
@@ -221,11 +248,14 @@ class Game {
   setItem(itemId) {
     this.item = itemId;
     this.$body.setAttribute('data-item', this.item);
+
+    this.writeData("I" + this.item);
   }
 
   resetCart() {
     this.cart = [];
     this.cartTotal = 0;
+    this.$cardDatas.innerHTML = '';
     this.displayCart();
   }
 

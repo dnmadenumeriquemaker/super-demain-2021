@@ -1,19 +1,19 @@
 let game = new Game();
+const serial = new WebSerial({
+  log:true
+});
 
 document.addEventListener("DOMContentLoaded", function() {
-  game.init();
-  game.setState(STATE_WAIT);
-  /*
-  game.code = 'item3';
-  game.triggerCode();
 
-  game.code = 'data1';
-  game.triggerCode();
-  game.code = 'data2';
-  game.triggerCode();
-  game.code = 'data4';
-  game.triggerCode();
-  */
+  game.init({
+    serial: serial
+  });
+
+  serial.on('data', data => {
+    game.onData(data);
+  });
+
+  game.setState(STATE_WAIT);
 });
 
 document.addEventListener("keydown", function(e) {

@@ -11,10 +11,13 @@
 
 
 <body>
+  <marquee scrollamount="16" scrolldelay="0" data-when-state="wait">Bienvenue au supermarché des données !</marquee>
+  <marquee scrollamount="16" scrolldelay="0" data-when-state="cart">Scannez les objets à 30 cm de la scanette</marquee>
+  <marquee scrollamount="16" scrolldelay="0" data-when-state="checkout">Transaction en cours…</marquee>
+  <marquee scrollamount="16" scrolldelay="0" data-when-state="outro">Récupérez votre ticket de caisse !</marquee>
 
   <div id="game">
     <section class="state-screen" data-state-screen="wait">
-
     </section>
 
     <section class="state-screen" data-state-screen="cart">
@@ -103,7 +106,7 @@
     </div>
 
     <div class="data" data-data-id="8" data-data-price="90">
-      <div class="data-name">Situation finacière</div>
+      <div class="data-name">Situation financière</div>
       <div class="data-price">90</div>
     </div>
 
@@ -117,6 +120,7 @@
 
   <script type="text/javascript" src="js/jquery.js"></script>
   <script type="text/javascript" src="js/jquery-ui.js"></script>
+  <script type="text/javascript" src="js/webserial.min.js"></script>
   <script type="text/javascript" src="js/game.js"></script>
   <script type="text/javascript" src="js/js.js"></script>
 </body>
