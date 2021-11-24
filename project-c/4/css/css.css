@@ -1,0 +1,27 @@
+@font-face {
+  font-family: 'Londrina';
+  src: url('../fonts/londrinasolid-regular-webfont.woff2') format('woff2'),
+       url('../fonts/londrinasolid-regular-webfont.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+body {
+  background:black;
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+}
+
+#game {
+  width:1920px;
+  height:1080px;
+  background:white;
+  position:absolute;
+  top:50px;
+  left:50px;
+  overflow:hidden;
+}
