@@ -11,7 +11,7 @@ const STATE_WAIT_FIRST_PLAYER = 'wait-first-player',
       STATE_OUTRO = 'outro';
 
 const DURATION_WAIT_FIRST_PLAYER_LOOP = 60000, // Temps entre chaque répétition du message d'accueil
-      DURATION_WAIT_MORE_PLAYERS = 15000, // Temps pour que d'autres joueurs rejoignent le premier
+      DURATION_WAIT_MORE_PLAYERS = 10000, // Temps pour que d'autres joueurs rejoignent le premier
       DURATION_NEW_THEME_READING = 6000, // Temps pour que le joueur lise le thème à voix haute
       DURATION_BETWEEN_RULES_AND_VOTE_1 = 1000, // Temps entre les règles du jeu et le premier vote
       DURATION_VOTE = 5000, // Temps pour voter
@@ -81,10 +81,12 @@ class Game {
 
       case STATE_WAIT_MORE_PLAYERS :
 
+        clearTimeout(this.timerState);
         this.writeData("state/waitmoreplayers");
 
         this.playAudioThen(AUDIO_WAIT_MORE_PLAYERS, function(){
           _this.doThisAfterDelay(function(){
+            console.log('settimeOUT check');
             _this.checkPlayersBeforeIntro();
           }, DURATION_WAIT_MORE_PLAYERS);
         });
@@ -107,7 +109,7 @@ class Game {
         let randomAlivePlayer = this.getRandomAlivePlayer();
 
         this.writeData("state/votepicktheme");
-        this.writeData("player/"+randomAlivePlayer);
+        this.writeData("playerpicktheme/"+randomAlivePlayer);
 
         this.playAudioThen(AUDIO_VOTE_PICK_THEME + randomAlivePlayer, function(){
           _this.setNextStateAfterDelay(DURATION_NEW_THEME_READING);
@@ -353,6 +355,7 @@ class Game {
     let dataController = parts[1];
     let dataValue = parts[2];
 
+
     if (this.isState(STATE_WAIT_FIRST_PLAYER)) {
       // detect a single button
       // '1/button/true'
@@ -399,6 +402,27 @@ class Game {
         && dataValue == 'true'
       ) {
         // TODO : useful ? laisser le temps gérer le rythme ?
+      }
+    }
+
+    else if (this.isState(STATE_VOTE_CHOICE_1)
+          || this.isState(STATE_VOTE_CHOICE_2)
+          || this.isState(STATE_VOTE_CHOICE_3)) {
+
+
+      if (this.alivePlayers.indexOf(dataPlayer) == -1) return;
+
+      // detect a single button
+      // can be called multiple times
+      // '4/button/true'
+
+      if (
+        dataController == 'button'
+        && dataValue == 'true'
+      ) {
+                  console.log('send playervote');
+                  console.log('playervote/'+dataPlayer);
+        this.writeData('playervote/'+dataPlayer);
       }
     }
 
@@ -557,7 +581,7 @@ class Game {
       this.alivePlayers.push(player);
       this.playersWhoCanTalk.push(player);
 
-      this.writeData(player + "/alive");
+      this.writeData(player + "/playeralive");
 
       // if this is the 1st player
       if (this.isState(STATE_WAIT_FIRST_PLAYER)) {
@@ -577,6 +601,7 @@ class Game {
   }
 
   checkPlayersBeforeIntro() {
+    console.log('check it');
     if (this.alivePlayers.length >= 2) {
       if (this.state == STATE_WAIT_FIRST_PLAYER
        || this.state == STATE_WAIT_MORE_PLAYERS) {
@@ -589,7 +614,7 @@ class Game {
       this.setState(STATE_WAIT_FIRST_PLAYER);
     }
 
-    clearTimeout(this.timerState);
+    //clearTimeout(this.timerState);
   }
 
   setPlayerVote(player, value) {
