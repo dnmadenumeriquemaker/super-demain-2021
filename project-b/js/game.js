@@ -22,7 +22,9 @@ const DURATION_BETWEEN_INTRO_TRANSITION_AND_QUESTION = 4000, // Durée de la tra
       DURATION_TIMEOUT_PROMPT = 30000,
 
       DURATION_WON = 10000,
-      DURATION_LOST = 5000;
+      DURATION_LOST = 5000,
+
+      DEBOUNCER = 1000;
 
 
 const SCORE_MAX = 100,
@@ -43,6 +45,11 @@ class Game {
     this.timerScore = null;
     this.timerTimeout = null;
     this.timerState = null;
+
+    this.plugs = {
+      left: 1,
+      right: 1,
+    };
 
     this.nbQuestions = NB_QUESTIONS;
     this.scoreMax = SCORE_MAX;
@@ -71,23 +78,29 @@ class Game {
         clearTimeout(this.timerState);
         this.initGame();
         this.enableInteraction();
-        this.writeData('state/wait');
+      //  this.writeData('state/wait');
       break;
 
       case STATE_INTRO :
-        this.writeData('state/intro');
+        this.disableInteraction();
+        clearTimeout(this.timerState);
+        this.timerState = setTimeout(function(){
+          _this.enableInteraction();
+        }, DEBOUNCER);
+      //  this.writeData('state/intro');
       break;
 
       case STATE_PLAY :
+        clearTimeout(this.timerState);
         this.disableInteraction();
         this.setPlayStepId(0);
-        this.writeData('state/play');
+      //  this.writeData('state/play');
       break;
 
       case STATE_WON :
         this.disableInteraction();
         this.clearTimerPlayStep();
-        this.writeData('state/won');
+      //  this.writeData('state/won');
 
         clearTimeout(this.timerState);
         clearTimeout(this.timerTimeout);
@@ -100,7 +113,7 @@ class Game {
       case STATE_LOST :
         this.disableInteraction();
         this.clearTimerPlayStep();
-        this.writeData('state/lost');
+      //  this.writeData('state/lost');
 
         clearTimeout(this.timerState);
         clearTimeout(this.timerTimeout);
@@ -149,14 +162,37 @@ class Game {
 
     let parts = data.split('/');
 
+    if (parts[0] == 'button') {
+
+      if (parts[1] == 'left' && parseInt(parts[2]) != this.plugs.left) {
+        this.plugs.left = parseInt(parts[2]);
+        this.triggerPlugChange('left');
+      }
+
+      if (parts[1] == 'right' && parseInt(parts[2]) != this.plugs.right) {
+        this.plugs.right = parseInt(parts[2]);
+        this.triggerPlugChange('right');
+      }
+
+      if (parts[1] == 'left') {
+        this.plugs.left = parseInt(parts[2]);
+      }
+
+      if (parts[1] == 'right') {
+        this.plugs.right = parseInt(parts[2]);
+      }
+    }
+/*
     if (this.isState(STATE_WAIT) && data == 'plugged') {
       this.setNextState();
     }
-
+*/
+/*
     else if (this.isState(STATE_INTRO) && data == 'unplugged') {
       this.setNextState();
     }
-
+    */
+/*
     else if (this.isState(STATE_PLAY) && this.canInteract()) {
       if (parts[0] == 'choice') {
         if (parts[1] == 'left') {
@@ -166,6 +202,7 @@ class Game {
         }
       }
     }
+    */
   }
 
   writeData(data) {
@@ -173,6 +210,37 @@ class Game {
     serial.write(data);
   }
 
+
+  triggerPlugChange(side) {
+    if (this.isState(STATE_WAIT)
+    && (this.plugs.left == 0 || this.plugs.right == 0)) {
+      this.enableMagnets();
+      this.setNextState();
+    }
+
+    else if (this.isState(STATE_INTRO)
+    && (this.canInteract())
+    && (this.plugs.left == 1 && this.plugs.right == 1)) {
+      this.disableMagnets();
+      this.setNextState();
+    }
+    else if (this.isState(STATE_PLAY)
+    && (this.canInteract())) {
+      if (side == 'left' && this.plugs.left == 0) {
+        this.selectChoice(1);
+      } else if (side == 'right' && this.plugs.right == 0) {
+        this.selectChoice(2);
+      }
+    }
+  }
+
+  enableMagnets() {
+  //  this.writeData('magnets/high');
+  }
+
+  disableMagnets() {
+  //  this.writeData('magnets/low');
+  }
 
   setPlayStepId(stepId) {
     this.playStepId = stepId;
@@ -225,7 +293,7 @@ class Game {
       break;
 
       case PLAY_STEP_STATE_LISTEN_TO_USER :
-        this.writeData('F');
+        //this.writeData('F');
         this.enableInteraction();
         this.startTimerScore();
         this.timerTimeout = setTimeout(function(){
@@ -235,7 +303,7 @@ class Game {
 
       case PLAY_STEP_STATE_RIGHT_CHOICE :
         clearTimeout(this.timerTimeout);
-        this.writeData('G');
+        //this.writeData('G');
         this.stopTimerScore();
         this.disableInteraction();
         this.setDataAnswer('right');
@@ -248,7 +316,7 @@ class Game {
 
       case PLAY_STEP_STATE_WRONG_CHOICE :
         clearTimeout(this.timerTimeout);
-        this.writeData('H');
+        //this.writeData('H');
         this.stopTimerScore();
         this.disableInteraction();
         this.setDataAnswer('wrong');
@@ -261,7 +329,8 @@ class Game {
 
       case PLAY_STEP_STATE_OUTRO_TRANSITION :
         this.setTimerPlayStep(function(){
-          _this.writeData('I');
+          //_this.writeData('I');
+          _this.disableMagnets();
           _this.setNextPlayStep();
         }, DURATION_BETWEEN_OUTRO_TRANSITION_AND_INTRO_TRANSITION);
       break;
@@ -337,6 +406,8 @@ class Game {
 
   selectChoice(userChoice) {
     if (!this.canInteract()) return;
+
+    this.enableMagnets();
 
     const rightChoice = document.querySelector('.play-step[data-play-step-id="'+this.playStepId+'"]').getAttribute('data-right-choice');
 

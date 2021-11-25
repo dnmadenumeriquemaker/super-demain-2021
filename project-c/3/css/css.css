@@ -33,5 +33,14 @@ p {
   width:100%;
   margin-top:-1px;
   background:url(../assets/scroll-item.png) repeat-y top center / 100% auto;
-  height:100000000px;
+  height:10000px;
+}
+
+#restart {
+  position:fixed;
+  display:block;
+  bottom:0;
+  left:0;
+  width:100px;
+  height:100px;
 }

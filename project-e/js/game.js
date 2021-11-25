@@ -3,6 +3,9 @@ const STATE_WAIT_FIRST_PLAYER = 'wait-first-player',
       STATE_INTRO = 'intro',
       STATE_VOTE_PICK_THEME = 'vote-pick-theme',
       STATE_LISTEN_TO_VOTES = 'listen-to-votes',
+      STATE_VOTE_CHOICE_1 = 'vote-choice-1',
+      STATE_VOTE_CHOICE_2 = 'vote-choice-2',
+      STATE_VOTE_CHOICE_3 = 'vote-choice-3',
       STATE_VOTE_ENDED = 'vote-ended',
       STATE_TALK = 'talk',
       STATE_OUTRO = 'outro';
@@ -10,7 +13,8 @@ const STATE_WAIT_FIRST_PLAYER = 'wait-first-player',
 const DURATION_WAIT_FIRST_PLAYER_LOOP = 30000, // Temps entre chaque répétition du message d'accueil
       DURATION_WAIT_MORE_PLAYERS = 15000, // Temps pour que d'autres joueurs rejoignent le premier
       DURATION_NEW_THEME_READING = 10000, // Temps pour que le joueur lise le thème à voix haute
-      DURATION_TIMER_VOTE = 10000, // Temps pour voter
+      DURATION_BETWEEN_RULES_AND_VOTE_1 = 3000, // Temps entre les règles du jeu et le premier vote
+      DURATION_VOTE = 10000, // Temps pour voter
       DURATION_MAX_TIMER_TALK = 30000, // Temps MAXIMUM pour parler (par joueur)
       DURATION_OUTRO_TO_NEXT_GAME = 10000; // Temps entre la fin de partie et la prochaine partie
 
@@ -20,6 +24,9 @@ let   AUDIO_WAIT_FIRST_PLAYER = 'WAIT_FIRST_PLAYER',
       AUDIO_INTRO = 'INTRO',
       AUDIO_VOTE_PICK_THEME = 'VOTE_P', // 1, 2, 3, 4
       AUDIO_VOTE_START_TIMER = 'VOTE_START_TIMER',
+      AUDIO_VOTE_CHOICE_1 = 'VOTE_CHOICE_1',
+      AUDIO_VOTE_CHOICE_2 = 'VOTE_CHOICE_2',
+      AUDIO_VOTE_CHOICE_3 = 'VOTE_CHOICE_3',
       AUDIO_VOTE_ENDED = 'VOTE_ENDED',
       AUDIO_TALK_START = 'TALK_START_P', // 1, 2, 3, 4
       AUDIO_TALK_THEN = 'TALK_THEN_P', // 1, 2, 3, 4
@@ -108,10 +115,45 @@ class Game {
       break;
 
       case STATE_LISTEN_TO_VOTES :
+        clearTimeout(this.timerState);
+
         this.writeData("state/listentovotes");
 
-        this.playAudio(AUDIO_VOTE_START_TIMER);
-        this.setNextStateAfterDelay(DURATION_TIMER_VOTE);
+        this.playAudioThen(AUDIO_VOTE_START_TIMER, function(){
+          _this.doThisAfterDelay(function(){
+            _this.setNextState();
+          }, DURATION_BETWEEN_RULES_AND_VOTE_1);
+        });
+      break;
+
+      case STATE_VOTE_CHOICE_1 :
+        this.writeData("state/votechoice1");
+
+        this.playAudioThen(AUDIO_VOTE_CHOICE_1, function(){
+          _this.doThisAfterDelay(function(){
+            _this.setNextState();
+          }, DURATION_VOTE);
+        });
+      break;
+
+      case STATE_VOTE_CHOICE_2 :
+        this.writeData("state/votechoice2");
+
+        this.playAudioThen(AUDIO_VOTE_CHOICE_2, function(){
+          _this.doThisAfterDelay(function(){
+            _this.setNextState();
+          }, DURATION_VOTE);
+        });
+      break;
+
+      case STATE_VOTE_CHOICE_3 :
+        this.writeData("state/votechoice3");
+
+        this.playAudioThen(AUDIO_VOTE_CHOICE_3, function(){
+          _this.doThisAfterDelay(function(){
+            _this.setNextState();
+          }, DURATION_VOTE);
+        });
       break;
 
       case STATE_VOTE_ENDED :
@@ -265,6 +307,18 @@ class Game {
       break;
 
       case STATE_LISTEN_TO_VOTES :
+        this.setState(STATE_VOTE_CHOICE_1);
+      break;
+
+      case STATE_VOTE_CHOICE_1 :
+        this.setState(STATE_VOTE_CHOICE_2);
+      break;
+
+      case STATE_VOTE_CHOICE_2 :
+        this.setState(STATE_VOTE_CHOICE_3);
+      break;
+
+      case STATE_VOTE_CHOICE_3 :
         this.setState(STATE_VOTE_ENDED);
       break;
 
@@ -503,7 +557,7 @@ class Game {
       this.alivePlayers.push(player);
       this.playersWhoCanTalk.push(player);
 
-      //this.writeData(player + "/alive");
+      this.writeData(player + "/alive");
 
       // if this is the 1st player
       if (this.isState(STATE_WAIT_FIRST_PLAYER)) {
