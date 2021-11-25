@@ -10,12 +10,12 @@ const STATE_WAIT_FIRST_PLAYER = 'wait-first-player',
       STATE_TALK = 'talk',
       STATE_OUTRO = 'outro';
 
-const DURATION_WAIT_FIRST_PLAYER_LOOP = 30000, // Temps entre chaque répétition du message d'accueil
+const DURATION_WAIT_FIRST_PLAYER_LOOP = 60000, // Temps entre chaque répétition du message d'accueil
       DURATION_WAIT_MORE_PLAYERS = 15000, // Temps pour que d'autres joueurs rejoignent le premier
-      DURATION_NEW_THEME_READING = 10000, // Temps pour que le joueur lise le thème à voix haute
-      DURATION_BETWEEN_RULES_AND_VOTE_1 = 3000, // Temps entre les règles du jeu et le premier vote
-      DURATION_VOTE = 10000, // Temps pour voter
-      DURATION_MAX_TIMER_TALK = 30000, // Temps MAXIMUM pour parler (par joueur)
+      DURATION_NEW_THEME_READING = 6000, // Temps pour que le joueur lise le thème à voix haute
+      DURATION_BETWEEN_RULES_AND_VOTE_1 = 1000, // Temps entre les règles du jeu et le premier vote
+      DURATION_VOTE = 5000, // Temps pour voter
+      DURATION_MAX_TIMER_TALK = 15000, // Temps MAXIMUM pour parler (par joueur)
       DURATION_OUTRO_TO_NEXT_GAME = 10000; // Temps entre la fin de partie et la prochaine partie
 
 
