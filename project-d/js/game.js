@@ -1,4 +1,4 @@
-const STATE_WAIT = 'wait',
+﻿const STATE_WAIT = 'wait',
       STATE_CART = 'cart',
       STATE_CHECKOUT = 'checkout',
       STATE_OUTRO = 'outro';
@@ -232,11 +232,11 @@ class Game {
 
     text += ' de données qui ont ';
 
-    if (this.cartTotal <= 40) {
+    if (this.cartTotal <= 60) {
       text += 'peu';
-    } else if (this.cartTotal > 40 && this.cartTotal <= 90) {
+    } else if (this.cartTotal > 60 && this.cartTotal <= 150) {
       text += 'beaucoup';
-    } else if (this.cartTotal > 90) {
+    } else if (this.cartTotal > 150) {
       text += 'énormément';
     }
 

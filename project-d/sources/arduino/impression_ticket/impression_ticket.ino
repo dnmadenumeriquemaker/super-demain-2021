@@ -54,7 +54,6 @@ void serialEvent() {
         // cart list
         dataFromGame.remove(0, 1);
         cart = dataFromGame;
-        prix = 0;
 
         printTicket();
       }
@@ -89,7 +88,6 @@ void checkData() {
 
 
 void printTicket() {
-  
   printer.wake();       // MUST wake() before printing again, even if reset
   printer.setDefault();
   printer.begin();
@@ -142,7 +140,7 @@ void printTicket() {
     prix = prix + 30;
   }
   if (cart.indexOf("6") != -1) {
-    printer.println(F("ORIENTATION SEXUELLE        30R"));
+    printer.println(F("ORIENTATION SEXUELLE        10R"));
     prix = prix + 30;
   }
   if (cart.indexOf("7") != -1) {
