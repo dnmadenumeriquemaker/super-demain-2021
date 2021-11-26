@@ -18,6 +18,8 @@ int button4 = 5;
 
 bool players[4] = {false, false, false, false};
 
+int playersVotes[4] = {0, 0, 0, 0};
+
 CRGB leds[NUM_LEDS];
 
 String state = "ARDUINOBOOT";
@@ -29,6 +31,10 @@ int breathSpeed = 8;
 float hueTime = 0;
 int hueSpeed = 8;
 
+int playerPickTheme = 0;
+
+int playerTalking = 0;
+
 int playersLed[4][6] = {
   {0, 1, 2, 3, 4, 5},
   {6, 7, 8, 9, 10, 11},
@@ -37,6 +43,9 @@ int playersLed[4][6] = {
 };
 
 CRGB colorNoPlayer = CRGB(0, 0, 0);
+
+float breath;
+float hue;
 
 
 void setup() {
@@ -75,21 +84,21 @@ void loop() {
   int valButton2 = digitalRead(button2);
   int valButton3 = digitalRead(button3);
   int valButton4 = digitalRead(button4);
+  /*
+    Serial.print("but1 (");
+    Serial.print(valButton1);
 
-  Serial.print("but1 (");
-  Serial.print(valButton1);
+    Serial.print(") but2 (");
+    Serial.print(valButton2);
 
-  Serial.print(") but2 (");
-  Serial.print(valButton2);
+    Serial.print(") but3 (");
+    Serial.print(valButton3);
 
-  Serial.print(") but3 (");
-  Serial.print(valButton3);
+    Serial.print(") but4 (");
+    Serial.print(valButton4);
 
-  Serial.print(") but4 (");
-  Serial.print(valButton4);
-
-  Serial.println(")");
-
+    Serial.println(")");
+  */
 
   /* DEV*/
 
@@ -106,8 +115,8 @@ void loop() {
     hueTime = 0;
   }
 
-  float breath = map(sin(breathTime / breathSpeed) * 100, -100, 100, 50.0, 210.0);
-  float hue = map(sin(hueTime / hueSpeed) * 100, -100, 100, 180, 210);
+  breath = map(sin(breathTime / breathSpeed) * 100, -100, 100, 50.0, 210.0);
+  hue = map(sin(hueTime / hueSpeed) * 100, -100, 100, 180, 210);
 
   CRGB colorBreath = CHSV(hue, 255, breath);
 
@@ -118,20 +127,10 @@ void loop() {
   setPlayerColor(4, colorBreath);
 
 
-  FastLED.show();
   /* //DEV */
 
-  
-  if (state == "STATE_WAIT_FIRST_PLAYER") {
-    breathTime++;
-    hueTime++;
 
-    //setPlayerColor(1, colorBreath);
-    /*
-      setPlayerColor(2, color);
-      setPlayerColor(3, color);
-      setPlayerColor(4, color);
-    */
+  if (state == "STATE_WAIT_FIRST_PLAYER") {
 
     if (valButton1 == 0) {
       Serial.println("1/button/true");
@@ -152,14 +151,14 @@ void loop() {
 
 
   else if (state == "STATE_WAIT_MORE_PLAYERS") {
-    CRGB colorAlivePlayer = CRGB(205, 150, 0);
-    /*
+    CRGB colorAlivePlayer = CRGB(255, 255, 255);
+
 
     setPlayerColorIfAliveOrElse(1, colorAlivePlayer, colorBreath);
     setPlayerColorIfAliveOrElse(2, colorAlivePlayer, colorBreath);
     setPlayerColorIfAliveOrElse(3, colorAlivePlayer, colorBreath);
     setPlayerColorIfAliveOrElse(4, colorAlivePlayer, colorBreath);
-    */
+
 
     if (valButton1 == 0) {
       Serial.println("1/button/true");
@@ -180,61 +179,48 @@ void loop() {
 
 
   else if (state == "STATE_INTRO") {
-    CRGB colorAlivePlayer = CRGB(0, 255, 0);
-/*
+    CRGB colorAlivePlayer = CRGB(255, 255, 255);
+
     setPlayerColorIfAliveOrElse(1, colorAlivePlayer, colorNoPlayer);
     setPlayerColorIfAliveOrElse(2, colorAlivePlayer, colorNoPlayer);
     setPlayerColorIfAliveOrElse(3, colorAlivePlayer, colorNoPlayer);
     setPlayerColorIfAliveOrElse(4, colorAlivePlayer, colorNoPlayer);
-    */
+
+  }
+
+
+  else if (state == "STATE_VOTE_PICK_THEME") {
+    CRGB colorAlivePlayer = CHSV(255, 0, 50);
+    CRGB colorPlayerPickTheme = CHSV(180, 255, breath);
+    //CRGB colorBreath = CHSV(hue, 255, breath);
+
+    setPlayerColorIfPickThemeOrAliveOrElse(1, colorPlayerPickTheme, colorAlivePlayer, colorNoPlayer);
+    setPlayerColorIfPickThemeOrAliveOrElse(2, colorPlayerPickTheme, colorAlivePlayer, colorNoPlayer);
+    setPlayerColorIfPickThemeOrAliveOrElse(3, colorPlayerPickTheme, colorAlivePlayer, colorNoPlayer);
+    setPlayerColorIfPickThemeOrAliveOrElse(4, colorPlayerPickTheme, colorAlivePlayer, colorNoPlayer);
+
   }
 
 
   else if (state == "STATE_LISTEN_TO_VOTES") {
-    CRGB color = CRGB::Blue;
+    CRGB color = CRGB(255, 255, 255);
 
-   // setPlayerColor(1, color);
-    /*
-      setPlayerColor(2, color);
-      setPlayerColor(3, color);
-      setPlayerColor(4, color);
-    */
-  }
-
-  else if (state == "STATE_LISTEN_TO_VOTES") {
-
-    CRGB color = CRGB::Black;
-    /*
-      if (valPot1 < 330) {
-      color = CRGB::Cyan;
-      }
-
-      else if (valPot1 >= 330 && valPot1 < 660) {
-      color = CRGB::Blue;
-      }
-
-      else if (valPot1 >= 660) {
-      color = CRGB::Purple;
-      }
-
-
-      for (int i = 0; i < 6; i++) {
-      leds[i] = color;
-      }
-    */
+    setPlayerColorIfAliveOrElse(1, color, colorNoPlayer);
+    setPlayerColorIfAliveOrElse(2, color, colorNoPlayer);
+    setPlayerColorIfAliveOrElse(3, color, colorNoPlayer);
+    setPlayerColorIfAliveOrElse(4, color, colorNoPlayer);
 
   }
-  
-  if (state == "STATE_TALK") {
-    breathTime++;
-    hueTime++;
 
-    //setPlayerColor(1, colorBreath);
-    /*
-      setPlayerColor(2, color);
-      setPlayerColor(3, color);
-      setPlayerColor(4, color);
-    */
+  else if (state == "STATE_VOTE_CHOICE_1") {
+    CRGB color = CHSV(180, 255, breath);
+
+    setPlayerColorIfVotedOrAliveOrElse(1, color, colorNoPlayer);
+    setPlayerColorIfVotedOrAliveOrElse(2, color, colorNoPlayer);
+    setPlayerColorIfVotedOrAliveOrElse(3, color, colorNoPlayer);
+    setPlayerColorIfVotedOrAliveOrElse(4, color, colorNoPlayer);
+
+
 
     if (valButton1 == 0) {
       Serial.println("1/button/true");
@@ -253,117 +239,108 @@ void loop() {
     }
   }
 
+  else if (state == "STATE_VOTE_CHOICE_2") {
+    CRGB color = CHSV(200, 255, breath);
+
+    setPlayerColorIfVotedOrAliveOrElse(1, color, colorNoPlayer);
+    setPlayerColorIfVotedOrAliveOrElse(2, color, colorNoPlayer);
+    setPlayerColorIfVotedOrAliveOrElse(3, color, colorNoPlayer);
+    setPlayerColorIfVotedOrAliveOrElse(4, color, colorNoPlayer);
+
+
+    if (valButton1 == 0) {
+      Serial.println("1/button/true");
+    }
+
+    if (valButton2 == 0) {
+      Serial.println("2/button/true");
+    }
+
+    if (valButton3 == 0) {
+      Serial.println("3/button/true");
+    }
+
+    if (valButton4 == 0) {
+      Serial.println("4/button/true");
+    }
+  }
+
+  else if (state == "STATE_VOTE_CHOICE_3") {
+    CRGB color = CHSV(220, 255, breath);
+
+    setPlayerColorIfVotedOrAliveOrElse(1, color, colorNoPlayer);
+    setPlayerColorIfVotedOrAliveOrElse(2, color, colorNoPlayer);
+    setPlayerColorIfVotedOrAliveOrElse(3, color, colorNoPlayer);
+    setPlayerColorIfVotedOrAliveOrElse(4, color, colorNoPlayer);
+
+
+    if (valButton1 == 0) {
+      Serial.println("1/button/true");
+    }
+
+    if (valButton2 == 0) {
+      Serial.println("2/button/true");
+    }
+
+    if (valButton3 == 0) {
+      Serial.println("3/button/true");
+    }
+
+    if (valButton4 == 0) {
+      Serial.println("4/button/true");
+    }
+  }
+
+  if (state == "STATE_VOTE_ENDED") {
+    CRGB color = CHSV(220, 255, breath);
+
+    setPlayerColorIfVotedOrAliveOrElse(1, color, colorNoPlayer);
+    setPlayerColorIfVotedOrAliveOrElse(2, color, colorNoPlayer);
+    setPlayerColorIfVotedOrAliveOrElse(3, color, colorNoPlayer);
+    setPlayerColorIfVotedOrAliveOrElse(4, color, colorNoPlayer);
+
+    playerTalking = 0;
+  }
+
+
+
+  if (state == "STATE_TALK") {
+    CRGB color = CHSV(220, 255, breath);
+
+    setPlayerColorIfTalkingOrAliveOrElse(1, color, colorNoPlayer);
+    setPlayerColorIfTalkingOrAliveOrElse(2, color, colorNoPlayer);
+    setPlayerColorIfTalkingOrAliveOrElse(3, color, colorNoPlayer);
+    setPlayerColorIfTalkingOrAliveOrElse(4, color, colorNoPlayer);
+
+    if (valButton1 == 0) {
+      Serial.println("1/button/true");
+    }
+
+    if (valButton2 == 0) {
+      Serial.println("2/button/true");
+    }
+
+    if (valButton3 == 0) {
+      Serial.println("3/button/true");
+    }
+
+    if (valButton4 == 0) {
+      Serial.println("4/button/true");
+    }
+  }
+
+  if (state == "STATE_OUTRO") {
+
+    CRGB color = CHSV(220, 255, breath);
+
+    setPlayerColorIfVotedOrAliveOrElse(1, color, colorNoPlayer);
+    setPlayerColorIfVotedOrAliveOrElse(2, color, colorNoPlayer);
+    setPlayerColorIfVotedOrAliveOrElse(3, color, colorNoPlayer);
+    setPlayerColorIfVotedOrAliveOrElse(4, color, colorNoPlayer);
+  }
+
   FastLED.show();
 
-  /*
-    // DEUXIEME BOUTON COULEUR
-    int valPot2 = analogRead(A1);
-
-    if (valPot2 < 330)
-    {
-      for (int i = 6; i < 12; i++)
-      {
-        leds[i] = CRGB::Green;
-
-        // Show the leds (only one of which is set to white, from above)
-        FastLED.show();
-      }
-    }
-
-    else if (valPot2 > 330 && valPot2 < 660)
-    {
-      for (int i = 6; i < 12; i++)
-      {
-        leds[i] = CRGB::Yellow;
-
-        // Show the leds (only one of which is set to white, from above)
-        FastLED.show();
-      }
-    }
-
-    else if (valPot2 > 660)
-    {
-      for (int i = 6; i < 12; i++)
-      {
-        leds[i] = CRGB::Red;
-
-        // Show the leds (only one of which is set to white, from above)
-        FastLED.show();
-      }
-    }
-
-    //TROISIEME BOUTON COULEUR
-    int valPot3 = analogRead(A2);
-
-    if (valPot3 < 330)
-    {
-      for (int i = 12; i < 18; i++)
-      {
-        leds[i] = CRGB::Green;
-
-        // Show the leds (only one of which is set to white, from above)
-        FastLED.show();
-      }
-    }
-
-    else if (valPot3 > 330 && valPot3 < 660)
-    {
-      for (int i = 12; i < 18; i++)
-      {
-        leds[i] = CRGB::Yellow;
-
-        // Show the leds (only one of which is set to white, from above)
-        FastLED.show();
-      }
-    }
-
-    else if (valPot3 > 660)
-    {
-      for (int i = 12; i < 18; i++)
-      {
-        leds[i] = CRGB::Red;
-
-        // Show the leds (only one of which is set to white, from above)
-        FastLED.show();
-      }
-    }
-
-    // QUATRIEME BOUTON COULEUR
-    int valPot4 = analogRead(A3);
-
-    if (valPot4 < 330)
-    {
-      for (int i = 18; i < 24; i++)
-      {
-        leds[i] = CRGB::Green;
-
-        // Show the leds (only one of which is set to white, from above)
-        FastLED.show();
-      }
-    }
-
-    else if (valPot4 > 330 && valPot4 < 660)
-    {
-      for (int i = 18; i < 24; i++)
-      {
-        leds[i] = CRGB::Yellow;
-
-        // Show the leds (only one of which is set to white, from above)
-        FastLED.show();
-      }
-    }
-
-    else if (valPot4 > 660)
-    {
-      for (int i = 18; i < 24; i++)
-      {
-        leds[i] = CRGB::Red;
-
-        // Show the leds (only one of which is set to white, from above)
-        FastLED.show();
-      }
-    }
-  */
   delay(50);
 }
 
@@ -393,6 +370,13 @@ void checkData() {
     players[2] = false;
     players[3] = false;
 
+    playersVotes[0] = 0;
+    playersVotes[1] = 0;
+    playersVotes[2] = 0;
+    playersVotes[3] = 0;
+
+    playerPickTheme = 0;
+
     breathTime = 0;
     hueTime = 0;
     return;
@@ -413,13 +397,23 @@ void checkData() {
     return;
   }
 
-  if (dataFromGame == "state/waitfirstplayer") {
-    state = "STATE_WAIT_FIRST_PLAYER";
+  if (dataFromGame == "state/listentovotes") {
+    state = "STATE_LISTEN_TO_VOTES";
     return;
   }
 
-  if (dataFromGame == "state/listentovotes") {
-    state = "STATE_LISTEN_TO_VOTES";
+  if (dataFromGame == "state/votechoice1") {
+    state = "STATE_VOTE_CHOICE_1";
+    return;
+  }
+
+  if (dataFromGame == "state/votechoice2") {
+    state = "STATE_VOTE_CHOICE_2";
+    return;
+  }
+
+  if (dataFromGame == "state/votechoice3") {
+    state = "STATE_VOTE_CHOICE_3";
     return;
   }
 
@@ -460,6 +454,107 @@ void checkData() {
     players[3] = true;
     return;
   }
+
+
+
+
+  if (dataFromGame == "player/1") {
+    playerTalking = 1;
+    return;
+  }
+
+  if (dataFromGame == "player/2") {
+    playerTalking = 2;
+    return;
+  }
+
+  if (dataFromGame == "player/3") {
+    playerTalking = 3;
+    return;
+  }
+
+  if (dataFromGame == "player/4") {
+    playerTalking = 4;
+    return;
+  }
+
+
+
+
+  if (dataFromGame == "playerpicktheme/1") {
+    playerPickTheme = 1;
+    return;
+  }
+  if (dataFromGame == "playerpicktheme/2") {
+    playerPickTheme = 2;
+    return;
+  }
+  if (dataFromGame == "playerpicktheme/3") {
+    playerPickTheme = 3;
+    return;
+  }
+  if (dataFromGame == "playerpicktheme/4") {
+    playerPickTheme = 4;
+    return;
+  }
+
+
+
+
+  state.trim();
+
+  if (dataFromGame == "playervote/1") {
+
+    if (state == "STATE_VOTE_CHOICE_1") {
+      playersVotes[0] = 1;
+    }
+    else if (state == "STATE_VOTE_CHOICE_2") {
+      playersVotes[0] = 2;
+    }
+    else if (state == "STATE_VOTE_CHOICE_3") {
+      playersVotes[0] = 3;
+    }
+    return;
+  }
+
+  if (dataFromGame == "playervote/2") {
+    if (state == "STATE_VOTE_CHOICE_1") {
+      playersVotes[1] = 1;
+    }
+    else if (state == "STATE_VOTE_CHOICE_2") {
+      playersVotes[1] = 2;
+    }
+    else if (state == "STATE_VOTE_CHOICE_3") {
+      playersVotes[1] = 3;
+    }
+    return;
+  }
+
+  if (dataFromGame == "playervote/3") {
+    if (state == "STATE_VOTE_CHOICE_1") {
+      playersVotes[2] = 1;
+    }
+    else if (state == "STATE_VOTE_CHOICE_2") {
+      playersVotes[2] = 2;
+    }
+    else if (state == "STATE_VOTE_CHOICE_3") {
+      playersVotes[2] = 3;
+    }
+    return;
+  }
+
+  if (dataFromGame == "playervote/4") {
+    if (state == "STATE_VOTE_CHOICE_1") {
+      playersVotes[3] = 1;
+    }
+    else if (state == "STATE_VOTE_CHOICE_2") {
+      playersVotes[3] = 2;
+    }
+    else if (state == "STATE_VOTE_CHOICE_3") {
+      playersVotes[3] = 3;
+    }
+    return;
+  }
 }
 
 void setPlayerColor(int playerId, CRGB color) {
@@ -478,6 +573,88 @@ void setPlayerColorIfAliveOrElse(int playerId, CRGB color1, CRGB color2) {
   if (players[playerId - 1] == true) {
     setPlayerColor(playerId, color1);
   } else {
+    setPlayerColor(playerId, color2);
+  }
+}
+
+void setPlayerColorIfPickThemeOrAliveOrElse(int playerId, CRGB color1, CRGB color2, CRGB color3) {
+  if (playerId == playerPickTheme) {
+    setPlayerColor(playerId, color1);
+  }
+
+  else if (players[playerId - 1] == true) {
+    setPlayerColor(playerId, color2);
+  }
+
+  else {
+    setPlayerColor(playerId, color3);
+  }
+}
+
+void setPlayerColorIfVotedOrAliveOrElse(int playerId, CRGB color1, CRGB color2) {
+
+  if (players[playerId - 1] == true) {
+    if (playersVotes[playerId - 1] == 1) {
+      setPlayerColor(playerId, CHSV(180, 255, 255));
+    }
+
+    else if (playersVotes[playerId - 1] == 2) {
+      setPlayerColor(playerId, CHSV(200, 255, 255));
+    }
+
+    else if (playersVotes[playerId - 1] == 3) {
+      setPlayerColor(playerId, CHSV(220, 255, 255));
+    }
+
+    else if (playersVotes[playerId - 1] == 0) {
+      setPlayerColor(playerId, color1);
+    }
+
+  }
+
+  else {
+    setPlayerColor(playerId, color2);
+  }
+}
+
+
+
+
+
+void setPlayerColorIfTalkingOrAliveOrElse(int playerId, CRGB color1, CRGB color2) {
+
+  if (players[playerId - 1] == true) {
+    if (playersVotes[playerId - 1] == 1) {
+      if (playerTalking == playerId) {
+        setPlayerColor(playerId, CHSV(180, 255, breath));
+      } else {
+        setPlayerColor(playerId, CHSV(180, 255, 255));
+      }
+    }
+
+    else if (playersVotes[playerId - 1] == 2) {
+      if (playerTalking == playerId) {
+        setPlayerColor(playerId, CHSV(200, 255, breath));
+      } else {
+        setPlayerColor(playerId, CHSV(200, 255, 255));
+      }
+    }
+
+    else if (playersVotes[playerId - 1] == 3) {
+      if (playerTalking == playerId) {
+        setPlayerColor(playerId, CHSV(220, 255, breath));
+      } else {
+        setPlayerColor(playerId, CHSV(220, 255, 255));
+      }
+    }
+
+    else if (playersVotes[playerId - 1] == 0) {
+      setPlayerColor(playerId, color1);
+    }
+
+  }
+
+  else {
     setPlayerColor(playerId, color2);
   }
 }

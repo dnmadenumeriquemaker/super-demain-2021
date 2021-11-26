@@ -11,6 +11,16 @@ document.addEventListener("DOMContentLoaded", function() {
 
   setTimeout(function(){
     game.setState(STATE_WAIT_FIRST_PLAYER);
+    /*
+    game.addPlayer(1);
+    game.addPlayer(3);
+    game.checkPlayersBeforeIntro();
+    game.setState(STATE_VOTE_PICK_THEME);
+    game.setState(STATE_LISTEN_TO_VOTES);
+    setTimeout(function(){
+      game.setState(STATE_VOTE_CHOICE_1);
+    },2000);
+    */
   }, 1000);
 
   serial.on('data', data => {
